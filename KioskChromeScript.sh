@@ -143,7 +143,86 @@ cat > /etc/opt/chrome/policies/managed/policy.json << EOF
   ]
 }
 EOF
-	
+
+cat > /home/kiosk/.config/google-chrome/Default/Bookmarks << EOF
+{
+   "checksum": "fe887b6e1145bdc61b6bafe20bdb81fa",
+   "roots": {
+      "bookmark_bar": {
+         "children": [ {
+            "date_added": "13183642538941632",
+            "date_last_used": "0",
+            "guid": "00000000-0000-0000-0000-000000000001",
+            "id": "2",
+            "name": "Sbb",
+            "type": "url",
+            "url": "https://sbb.ch/"
+         }, {
+            "date_added": "13183642538941632",
+            "date_last_used": "0",
+            "guid": "00000000-0000-0000-0000-000000000002",
+            "id": "3",
+            "name": "Chefkoch",
+            "type": "url",
+            "url": "https://chefkoch.de/"
+         }, {
+            "date_added": "13183642538941632",
+            "date_last_used": "0",
+            "guid": "00000000-0000-0000-0000-000000000003",
+            "id": "4",
+            "name": "Wikipedia",
+            "type": "url",
+            "url": "https://wikipedia.org/"
+         }, {
+            "date_added": "13183642538941632",
+            "date_last_used": "0",
+            "guid": "00000000-0000-0000-0000-000000000004",
+            "id": "5",
+            "name": "AKAD",
+            "type": "url",
+            "url": "https://akad.ch/"
+         }, {
+            "date_added": "13183642538941632",
+            "date_last_used": "0",
+            "guid": "00000000-0000-0000-0000-000000000005",
+            "id": "6",
+            "name": "VHS-Lernportal",
+            "type": "url",
+            "url": "https://vhs-lernportal.de/"
+         } ],
+         "date_added": "13183642538941632",
+         "date_last_used": "0",
+         "date_modified": "13183642538941632",
+         "guid": "0bc5d13f-2cba-5d74-951f-3f233fe6c908",
+         "id": "1",
+         "name": "Lesezeichenleiste",
+         "type": "folder"
+      },
+      "other": {
+         "children": [  ],
+         "date_added": "13183642538941632",
+         "date_last_used": "0",
+         "date_modified": "13183642538941632",
+         "guid": "82b081ec-3dd3-529c-8475-ab6c344590dd",
+         "id": "7",
+         "name": "Weitere Lesezeichen",
+         "type": "folder"
+      },
+      "synced": {
+         "children": [  ],
+         "date_added": "13183642538941632",
+         "date_last_used": "0",
+         "date_modified": "13183642538941632",
+         "guid": "4cf2e351-0e85-532b-bb37-df045d8f8d0f",
+         "id": "8",
+         "name": "Mobile Lesezeichen",
+         "type": "folder"
+      }
+   },
+   "version": 1
+}
+EOF
+
 # Set ownership of Chrome policy directory
 chown -R kiosk:kiosk /etc/opt/chrome/policies/managed
 echo "Done!"
