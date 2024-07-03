@@ -5,6 +5,19 @@ apt install software-properties-common apt-transport-https ca-certificates curl 
 curl -fSsL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome.gpg >> /dev/null
 echo deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main | sudo tee /etc/apt/sources.list.d/google-chrome.list
 
+# Install plymouth
+apt install -y plymouth plymouth-themes
+# Set Theme to spinning wheel
+plymouth-set-default-theme -R spinner
+# Update grub
+update-grub2
+
+# Change GRUB settings
+if [ -e "/etc/default/grub" ]; then
+  sed -i 's/GRUB_TIMEOUT=5/GRUB_TIMEOUT=0/' /etc/default/grub
+  sed -i 's/GRUB_CMD_LINUX_DEFAULT="quiet"/GRUB_CMD_LINUX_DEFAULT="quiet splash"/' /etc/default/grub
+fi
+
 
 # Update package list
 apt update
@@ -63,21 +76,21 @@ do
   google-chrome \
     --no-first-run \
     --start-maximized \
-    --disable \
+    --incognito \
+    --force-app-mode \
+    --no-message-box \
     --disable-translate \
     --disable-infobars \
     --disable-suggestions-service \
     --disable-save-password-bubble \
     --disable-session-crashed-bubble \
-    --incognito \
     --disable-plugins \
     --disable-sync \
     --no-default-browser-check \
-    --no-first-run \
     --password-store=basic \
     --disable-extensions \
     --user-data-dir=/home/kiosk/.config/google-chrome
-  sleep 5
+  sleep 2
 done &
 EOF
 
@@ -86,45 +99,52 @@ mkdir -p /etc/opt/chrome/policies/managed
 # Create Chrome policy for bookmarks and URL whitelist
 cat > /etc/opt/chrome/policies/managed/policy.json << EOF
 {
-  "URLAllowlist": ["https://sbb.ch/", "https://chefkoch.de/", "https://wikipedia.org/", "https://akad.ch/",  "https://vhs-lernportal.de/"],
+  "URLAllowlist": ["chrome:*","https://sbb.ch/", "https://chefkoch.de/", "https://wikipedia.org/", "https://akad.ch/",  "https://vhs-lernportal.de/"],
   "URLBlocklist": ["*"],
   "HomepageLocation": "https://sbb.ch/",
   "RestoreOnStartup": 4,
   "RestoreOnStartupURLs": ["https://sbb.ch/"],
   "PasswordManagerEnabled": false,
   "SavingBrowserHistoryDisabled": true,
+  "BrowserAddPersonEnabled":false,
+  "BrowserGuestModeEnabled":false,
+  "BrowserSignin":0,
+  "PrintingEnabled":false,
+  "DeveloperToolsAvailability":2,
+  "TaskManagerEndProcessEnabled":false,
+  "DownloadRestrictions":3,
+  "SharedClipboardEnabled":false,
+  "NewTabPageLocation":"google.com",
+  "SearchSuggestEnabled":false,
+  "EditBookmarksEnabled":false,
   "BookmarkBarEnabled": true,
+  "ImportBookmarks":false,
   "ManagedBookmarks": [
     {
-      "toplevel_name": "Managed bookmarks",
-      "children": [
-        {
-          "name": "Sbb",
-          "url": "https://sbb.ch/"
-        },
-        {
-          "name": "Chefkoch",
-          "url": "https://chefkoch.de/"
-        },
-        {
-          "name": "Wikipedia",
-          "url": "https://wikipedia.org/"
-        },
-        {
-          "name": "AKAD",
-          "url": "https://akad.ch/"
-        },
-        {
-          "name": "VHS-Lernportal",
-          "url": "https://vhs-lernportal.de/"
-        }
-      ]
+      "name": "SBB",
+      "url": "https://www.sbb.ch/"
+    },
+    {
+      "name": "Google",
+      "url": "https://www.google.com/"
+    },
+    {
+      "name": "Youtube",
+      "url": "https://www.youtube.com/"
+    },
+    {
+      "name": "Chromium",
+      "url": "https://www.chromium.org/"
+    },
+    {
+      "name": "Chromium Developers",
+      "url": "https://dev.chromium.org/"
     }
   ]
 }
 EOF
 	
 # Set ownership of Chrome policy directory
-chown -R kiosk:kiosk /etc/chrome
+chown -R kiosk:kiosk /etc/opt/chrome/policies/managed
 echo "Done!"
 
