@@ -125,20 +125,20 @@ cat > /etc/opt/chrome/policies/managed/policy.json << EOF
       "url": "https://www.sbb.ch/"
     },
     {
-      "name": "Google",
-      "url": "https://www.google.com/"
+      "name": "Chefkoch",
+      "url": "https://chefkoch.de/"
     },
     {
-      "name": "Youtube",
-      "url": "https://www.youtube.com/"
+      "name": "Wikipedia",
+      "url": "https://wikipedia.org/"
     },
     {
-      "name": "Chromium",
-      "url": "https://www.chromium.org/"
+      "name": "AKAD",
+      "url": "https://akad.ch
     },
     {
-      "name": "Chromium Developers",
-      "url": "https://dev.chromium.org/"
+      "name": "VHS-lernportal",
+      "url": "https://vhs-lernportal.de/"
     }
   ]
 }
