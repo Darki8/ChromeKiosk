@@ -98,17 +98,6 @@ do
 done &
 EOF
 
-### DEBUGING PURPOSE
-cat > /home/kiosk/.config/openbox/rc.xml << EOF
-<keybind key="C-A-T">
-  <action name="Execute">
-    <command>x-terminal-emulator</command>
-  </action>
-</keybind>
-EOF
-### DEBUGING PURPOSE
-
-
 # Create Chrome policy directory
 mkdir -p /etc/opt/chrome/policies/managed
 # Create Chrome policy for bookmarks and URL whitelist
@@ -149,7 +138,7 @@ cat > /etc/opt/chrome/policies/managed/policy.json << EOF
     },
     {
       "name": "AKAD",
-      "url": "https://akad.ch
+      "url": "https://akad.ch/"
     },
     {
       "name": "VHS-lernportal",
@@ -159,7 +148,7 @@ cat > /etc/opt/chrome/policies/managed/policy.json << EOF
 }
 EOF
 
-mkdir /home/kiosk/.config/google-chrome/Default
+mkdir -p /home/kiosk/.config/google-chrome/Default
 cat > /home/kiosk/.config/google-chrome/Default/Bookmarks << EOF
 {
    "checksum": "fe887b6e1145bdc61b6bafe20bdb81fa",
