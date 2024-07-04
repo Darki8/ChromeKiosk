@@ -47,7 +47,7 @@ id -u kiosk &>/dev/null || useradd -m kiosk -g kiosk -s /bin/bash
 chown -R kiosk:kiosk /home/kiosk
 
 # Move Image from Current admin to kiosk
-mv "$(pwd)/UPK_Basel_Logo-edit.png" /home/kiosk
+mv "$(pwd)/UPK_Basel_Logo.png" /home/kiosk/UPK_Basel_Logo.png
 
 # Disable virtual console switching
 if [ -e "/etc/X11/xorg.conf" ]; then
