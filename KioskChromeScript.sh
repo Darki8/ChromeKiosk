@@ -18,6 +18,9 @@ if [ -e "/etc/default/grub" ]; then
   sed -i 's/GRUB_CMD_LINUX_DEFAULT="quiet"/GRUB_CMD_LINUX_DEFAULT="quiet splash"/' /etc/default/grub
 fi
 
+# Install feh for Background image
+apt install feh
+
 
 # Update package list
 apt update
@@ -42,6 +45,9 @@ id -u kiosk &>/dev/null || useradd -m kiosk -g kiosk -s /bin/bash
 
 # Set correct ownership
 chown -R kiosk:kiosk /home/kiosk
+
+# Move Image from Current admin to kiosk
+mv "$(pwd)/UPK_Basel_Logo-edit.png" /home/kiosk
 
 # Disable virtual console switching
 if [ -e "/etc/X11/xorg.conf" ]; then
@@ -70,9 +76,12 @@ fi
 cat > /home/kiosk/.config/openbox/autostart << EOF
 #!/bin/bash
 
-#Setup Network
+# Setup Network
 ifconfig eth0 up
 dhclient
+
+#set Backgound image
+feh --bg-scale /home/kiosk/UPK_Basel_Logo.png &
 
 while :
 do
