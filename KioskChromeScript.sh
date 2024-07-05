@@ -47,7 +47,7 @@ id -u kiosk &>/dev/null || useradd -m kiosk -g kiosk -s /bin/bash
 chown -R kiosk:kiosk /home/kiosk
 
 # Move Image from Current admin to kiosk
-mv "$(pwd)/UPK_Basel_Logo.png" /home/kiosk/UPK_Basel_Logo.png
+mv "$(pwd)/Logo.png" /home/kiosk/Logo.png
 
 # Disable virtual console switching
 if [ -e "/etc/X11/xorg.conf" ]; then
@@ -81,7 +81,7 @@ ifconfig eth0 up
 dhclient
 
 #set Backgound image
-feh --bg-scale /home/kiosk/UPK_Basel_Logo.png &
+feh --bg-scale /home/kiosk/Logo.png &
 
 while :
 do
