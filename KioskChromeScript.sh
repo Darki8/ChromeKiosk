@@ -19,7 +19,7 @@ if [ -e "/etc/default/grub" ]; then
 fi
 
 # Install feh for Background image
-apt install feh
+apt install feh -y
 
 
 # Update package list
