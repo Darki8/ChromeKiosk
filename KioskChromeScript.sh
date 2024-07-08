@@ -30,7 +30,7 @@ plymouth-set-default-theme -R spinner
 # Change GRUB settings
 if [ -e "/etc/default/grub" ]; then
   sed -i 's/GRUB_TIMEOUT=5/GRUB_TIMEOUT=0/' /etc/default/grub
-  sed -i 's/GRUB_CMD_LINUX_DEFAULT="quiet"/GRUB_CMD_LINUX_DEFAULT="quiet splash"/' /etc/default/grub
+  sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="[^"]*"/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/' /etc/default/grub
 fi
 
 # Update grub
