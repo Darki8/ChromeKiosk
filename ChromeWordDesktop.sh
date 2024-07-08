@@ -6,6 +6,13 @@ apt-get install -y kde-plasma-desktop
 # Install LibreOffice
 apt-get install -y libreoffice
 
+# Setup kiosk user and environment
+getent group kiosk || groupadd kiosk
+id -u kiosk &>/dev/null || useradd -m kiosk -g kiosk -s /bin/bash 
+mkdir -p /home/kiosk/.config/openbox
+chown -R kiosk:kiosk /home/kiosk
+
+
 if [ -e "/etc/lightdm/lightdm.conf" ]; then
   mv /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf.backup
 fi
