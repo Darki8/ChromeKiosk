@@ -8,7 +8,8 @@ apt-get install -y \
     feh \
     unclutter \
     xorg \
-    openbox \
+    xfce4 \
+    xfce4-goodies \
     lightdm \
     locales \
     software-properties-common \
@@ -17,9 +18,9 @@ apt-get install -y \
     curl \
     plymouth \
     plymouth-themes \
-    xfce4 \
-    xfce4-goodies \
-    libreoffice
+    libreoffice \
+    cups \
+    system-config-printer
 
 # Install Google Chrome
 curl -fSsL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome.gpg > /dev/null
@@ -41,7 +42,7 @@ update-grub
 # Setup kiosk user and environment
 getent group kiosk || groupadd kiosk
 id -u kiosk &>/dev/null || useradd -m kiosk -g kiosk -s /bin/bash 
-mkdir -p /home/kiosk/.config/openbox /home/kiosk/.config/autostart
+mkdir -p /home/kiosk/.config/openbox /home/kiosk/.config/autostart /home/kiosk/.config/xfce4/xfconf/xfce-perchannel-xml
 chown -R kiosk:kiosk /home/kiosk
 mv "$(pwd)/Logo.png" /home/kiosk/Logo.png
 
@@ -65,6 +66,21 @@ autologin-user=kiosk
 user-session=xfce
 EOF
 
+# Configure XFCE panel to be at the bottom and locked
+cat > /home/kiosk/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+
+<channel name="xfce4-panel" version="1.0">
+  <property name="panels" type="array">
+    <value type="int" value="1"/>
+  </property>
+  <property name="panel-1" type="empty">
+    <property name="position" type="string" value="p=8;x=0;y=0"/>
+    <property name="lockPanel" type="bool" value="true"/>
+  </property>
+</channel>
+EOF
+
 # Configure autostart for Chrome in XFCE
 cat > /home/kiosk/.config/autostart/chrome.desktop << EOF
 [Desktop Entry]
@@ -74,6 +90,56 @@ Hidden=false
 X-GNOME-Autostart-enabled=true
 Name=Google Chrome
 Comment=Start Google Chrome in Kiosk Mode
+EOF
+
+# Create menu item to launch LibreOffice Writer
+cat > /home/kiosk/.config/autostart/libreoffice-writer.desktop << EOF
+[Desktop Entry]
+Type=Application
+Exec=/usr/bin/libreoffice --writer
+Hidden=false
+X-GNOME-Autostart-enabled=true
+Name=LibreOffice Writer
+Comment=Start LibreOffice Writer
+EOF
+
+# Create menu item to launch LibreOffice Calc
+cat > /home/kiosk/.config/autostart/libreoffice-calc.desktop << EOF
+[Desktop Entry]
+Type=Application
+Exec=/usr/bin/libreoffice --calc
+Hidden=false
+X-GNOME-Autostart-enabled=true
+Name=LibreOffice Calc
+Comment=Start LibreOffice Calc
+EOF
+
+# Create menu item to launch LibreOffice Impress
+cat > /home/kiosk/.config/autostart/libreoffice-impress.desktop << EOF
+[Desktop Entry]
+Type=Application
+Exec=/usr/bin/libreoffice --impress
+Hidden=false
+X-GNOME-Autostart-enabled=true
+Name=LibreOffice Impress
+Comment=Start LibreOffice Impress
+EOF
+
+# Configure the system to disable logout, suspend, and user switching
+cat > /home/kiosk/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml << EOF
+<?xml version="1.0" encoding="UTF-8"?>
+
+<channel name="xfce4-session" version="1.0">
+  <property name="logout" type="empty">
+    <property name="Prompt" type="bool" value="false"/>
+    <property name="ShowSuspend" type="bool" value="false"/>
+    <property name="ShowHibernate" type="bool" value="false"/>
+    <property name="ShowShutdown" type="bool" value="false"/>
+    <property name="ShowRestart" type="bool" value="false"/>
+    <property name="ShowLogout" type="bool" value="false"/>
+    <property name="ShowSwitchUser" type="bool" value="false"/>
+  </property>
+</channel>
 EOF
 
 # Set up Chrome policies
