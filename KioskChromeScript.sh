@@ -8,7 +8,6 @@ apt-get install -y \
 	feh \
  	unclutter \
 	xorg \
-	google-chrome-stable \
 	openbox \
 	lightdm \
 	locales \
