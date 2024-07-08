@@ -7,7 +7,7 @@ apt-get update && apt-get upgrade -y
 apt-get install -y \
 	xorg \
 	openbox \
-	lightdm \
+	sddm \
 	locales \
  	software-properties-common \
   apt-transport-https \
@@ -48,14 +48,16 @@ mkdir -p /home/kiosk/.config/openbox
 chown -R kiosk:kiosk /home/kiosk
 
 
-if [ -e "/etc/lightdm/lightdm.conf" ]; then
-  mv /etc/lightdm/lightdm.conf /etc/lightdm/lightdm.conf.backup
+if [ -e "/etc/sddm.conf" ]; then
+  mv /etc/sddm.conf /etc/sddm.conf.backup
 fi
-cat > /etc/lightdm/lightdm.conf << EOF
-[SeatDefaults]
-autologin-user=kiosk
-user-session=plasma
+cat > /etc/sddm.conf << EOF
+[Autologin]
+User=kiosk
+Session=plasma.desktop
 EOF
+
+mkdir -p /home/kiosk/Desktop/
 
 # Create desktop shortcut for Google Chrome
 cat > /home/kiosk/Desktop/Google-Chrome.desktop << EOF
