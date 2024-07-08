@@ -42,7 +42,7 @@ update-grub
 # Setup kiosk user and environment
 getent group kiosk || groupadd kiosk
 id -u kiosk &>/dev/null || useradd -m kiosk -g kiosk -s /bin/bash 
-mkdir -p /home/kiosk/.config/openbox /home/kiosk/.config/autostart /home/kiosk/.config/xfce4/xfconf/xfce-perchannel-xml
+mkdir -p /home/kiosk/.config/openbox /home/kiosk/.config/autostart /home/kiosk/.config/xfce4/xfconf/xfce-perchannel-xml /home/kiosk/Desktop
 chown -R kiosk:kiosk /home/kiosk
 mv "$(pwd)/Logo.png" /home/kiosk/Logo.png
 
@@ -66,7 +66,7 @@ autologin-user=kiosk
 user-session=xfce
 EOF
 
-# Configure XFCE panel to be at the bottom and locked
+# Configure XFCE panel to be at the bottom and include shortcuts
 cat > /home/kiosk/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml << EOF
 <?xml version="1.0" encoding="UTF-8"?>
 
@@ -77,52 +77,70 @@ cat > /home/kiosk/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml << EO
   <property name="panel-1" type="empty">
     <property name="position" type="string" value="p=8;x=0;y=0"/>
     <property name="lockPanel" type="bool" value="true"/>
+    <property name="plugin-ids" type="array">
+      <value type="int" value="1"/>
+      <value type="int" value="2"/>
+      <value type="int" value="3"/>
+    </property>
+    <property name="length" type="int" value="100"/>
+    <property name="position-locked" type="bool" value="true"/>
+    <property name="size" type="int" value="40"/>
+  </property>
+  <property name="plugins">
+    <property name="plugin-1" type="empty">
+      <property name="type" type="string" value="applicationsmenu"/>
+      <property name="menu-items" type="array">
+        <value type="string" value="chrome.desktop"/>
+        <value type="string" value="libreoffice-writer.desktop"/>
+        <value type="string" value="libreoffice-calc.desktop"/>
+        <value type="string" value="libreoffice-impress.desktop"/>
+      </property>
+    </property>
+    <property name="plugin-2" type="empty">
+      <property name="type" type="string" value="tasklist"/>
+    </property>
+    <property name="plugin-3" type="empty">
+      <property name="type" type="string" value="clock"/>
+    </property>
   </property>
 </channel>
 EOF
 
-# Configure autostart for Chrome in XFCE
-cat > /home/kiosk/.config/autostart/chrome.desktop << EOF
+# Create desktop icons for Chrome and LibreOffice
+cat > /home/kiosk/Desktop/chrome.desktop << EOF
 [Desktop Entry]
 Type=Application
-Exec=/usr/bin/google-chrome --no-first-run --start-maximized --incognito --force-app-mode --no-message-box --disable-translate --disable-infobars --disable-suggestions-service --disable-save-password-bubble --disable-session-crashed-bubble --disable-plugins --disable-sync --no-default-browser-check --password-store=basic --disable-extensions --user-data-dir=/home/kiosk/.config/google-chrome
-Hidden=false
-X-GNOME-Autostart-enabled=true
 Name=Google Chrome
-Comment=Start Google Chrome in Kiosk Mode
+Exec=/usr/bin/google-chrome
+Icon=google-chrome
+Terminal=false
 EOF
 
-# Create menu item to launch LibreOffice Writer
-cat > /home/kiosk/.config/autostart/libreoffice-writer.desktop << EOF
+cat > /home/kiosk/Desktop/libreoffice-writer.desktop << EOF
 [Desktop Entry]
 Type=Application
-Exec=/usr/bin/libreoffice --writer
-Hidden=false
-X-GNOME-Autostart-enabled=true
 Name=LibreOffice Writer
-Comment=Start LibreOffice Writer
+Exec=/usr/bin/libreoffice --writer
+Icon=libreoffice-writer
+Terminal=false
 EOF
 
-# Create menu item to launch LibreOffice Calc
-cat > /home/kiosk/.config/autostart/libreoffice-calc.desktop << EOF
+cat > /home/kiosk/Desktop/libreoffice-calc.desktop << EOF
 [Desktop Entry]
 Type=Application
-Exec=/usr/bin/libreoffice --calc
-Hidden=false
-X-GNOME-Autostart-enabled=true
 Name=LibreOffice Calc
-Comment=Start LibreOffice Calc
+Exec=/usr/bin/libreoffice --calc
+Icon=libreoffice-calc
+Terminal=false
 EOF
 
-# Create menu item to launch LibreOffice Impress
-cat > /home/kiosk/.config/autostart/libreoffice-impress.desktop << EOF
+cat > /home/kiosk/Desktop/libreoffice-impress.desktop << EOF
 [Desktop Entry]
 Type=Application
-Exec=/usr/bin/libreoffice --impress
-Hidden=false
-X-GNOME-Autostart-enabled=true
 Name=LibreOffice Impress
-Comment=Start LibreOffice Impress
+Exec=/usr/bin/libreoffice --impress
+Icon=libreoffice-impress
+Terminal=false
 EOF
 
 # Configure the system to disable logout, suspend, and user switching
