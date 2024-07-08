@@ -31,6 +31,9 @@ sudo ./KioskChromeScript.sh
 
 The script will execute and set up the Chrome kiosk environment. Please be patient and wait for the script to complete its execution.
 
+>[!WARNING]
+>There is a known Issue that the plymouth splash screen is not properly working. Reason: Unkown.
+
 ## What the Script Does
 
 This script sets up a kiosk environment using Google Chrome on a Debian-based system. Here are the main actions performed:
