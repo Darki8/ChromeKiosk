@@ -143,6 +143,12 @@ Icon=libreoffice-impress
 Terminal=false
 EOF
 
+# Mark desktop files as executable to avoid "Untrusted Application Launcher" message
+chmod +x /home/kiosk/Desktop/chrome.desktop
+chmod +x /home/kiosk/Desktop/libreoffice-writer.desktop
+chmod +x /home/kiosk/Desktop/libreoffice-calc.desktop
+chmod +x /home/kiosk/Desktop/libreoffice-impress.desktop
+
 # Configure the system to disable logout, suspend, and user switching
 cat > /home/kiosk/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml << EOF
 <?xml version="1.0" encoding="UTF-8"?>
@@ -202,7 +208,7 @@ cat > /home/kiosk/.config/google-chrome/Default/Bookmarks << EOF
   "roots": {
     "bookmark_bar": {
       "children": [
-        {"date_added": "13183642538941632","guid": "00000000-0000-0000-0000-000000000001","id": "2","name": "SBB","type": "url","url": "https://sbb.ch/"},
+        {"date_added": "13183642538941632","guid": "00000000-0000-0000-0000-000000000001","id": "2","name": "Sbb","type": "url","url": "https://sbb.ch/"},
         {"date_added": "13183642538941632","guid": "00000000-0000-0000-0000-000000000002","id": "3","name": "Chefkoch","type": "url","url": "https://chefkoch.de/"},
         {"date_added": "13183642538941632","guid": "00000000-0000-0000-0000-000000000003","id": "4","name": "Wikipedia","type": "url","url": "https://wikipedia.org/"},
         {"date_added": "13183642538941632","guid": "00000000-0000-0000-0000-000000000004","id": "5","name": "AKAD","type": "url","url": "https://akad.ch/"},
@@ -239,6 +245,6 @@ cat > /home/kiosk/.config/google-chrome/Default/Bookmarks << EOF
 EOF
 
 # Set ownership of directories
-chown -R kiosk:kiosk /etc/opt/chrome/policies/managed /home/kiosk/.config
+chown -R kiosk:kiosk /etc/opt/chrome/policies/managed /home/kiosk/.config /home/kiosk/Desktop
 
 echo "Done!"
