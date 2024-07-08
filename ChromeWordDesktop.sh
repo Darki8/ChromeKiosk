@@ -66,36 +66,6 @@ autologin-user=kiosk
 user-session=xfce
 EOF
 
-# Configure XFCE panel to be at the bottom and include shortcuts
-cat > /home/kiosk/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml << EOF
-<?xml version="1.0" encoding="UTF-8"?>
-<channel name="xfce4-panel" version="1.0">
-  <property name="panels" type="array">
-    <value type="int" value="1"/>
-  </property>
-  <property name="panel-1" type="empty">
-    <property name="position" type="string" value="p=8;x=0;y=0"/> <!-- Align at bottom -->
-    <property name="length" type="uint" value="100"/>
-    <property name="plugin-ids" type="array">
-      <value type="int" value="1"/>
-      <value type="int" value="2"/>
-      <value type="int" value="3"/>
-      <value type="int" value="4"/>
-      <value type="int" value="5"/>
-      <value type="int" value="6"/>
-    </property>
-  </property>
-  <property name="plugins">
-    <property name="plugin-1" type="string" value="applicationsmenu"/>
-    <property name="plugin-2" type="string" value="separator"/>
-    <property name="plugin-3" type="string" value="tasklist"/>
-    <property name="plugin-4" type="string" value="separator"/>
-    <property name="plugin-5" type="string" value="separator"/>
-    <property name="plugin-6" type="string" value="clock"/>
-  </property>
-</channel>
-EOF
-
 # Create desktop icons for Chrome and LibreOffice
 cat > /home/kiosk/Desktop/chrome.desktop << EOF
 [Desktop Entry]
@@ -143,22 +113,37 @@ chmod +x /home/kiosk/Desktop/libreoffice-writer.desktop
 chmod +x /home/kiosk/Desktop/libreoffice-calc.desktop
 chmod +x /home/kiosk/Desktop/libreoffice-impress.desktop
 
-# Configure the system to disable logout, suspend, and user switching
-cat > /home/kiosk/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-session.xml << EOF
+# Configure XFCE panel to be at the bottom and include shortcuts
+cat > /home/kiosk/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml << EOF
 <?xml version="1.0" encoding="UTF-8"?>
-
-<channel name="xfce4-session" version="1.0">
-  <property name="logout" type="empty">
-    <property name="Prompt" type="bool" value="false"/>
-    <property name="ShowSuspend" type="bool" value="false"/>
-    <property name="ShowHibernate" type="bool" value="false"/>
-    <property name="ShowShutdown" type="bool" value="false"/>
-    <property name="ShowRestart" type="bool" value="false"/>
-    <property name="ShowLogout" type="bool" value="false"/>
-    <property name="ShowSwitchUser" type="bool" value="false"/>
+<channel name="xfce4-panel" version="1.0">
+  <property name="panels" type="array">
+    <value type="int" value="1"/>
+  </property>
+  <property name="panel-1" type="empty">
+    <property name="position" type="string" value="p=8;x=0;y=0"/> <!-- Align at bottom -->
+    <property name="length" type="uint" value="100"/>
+    <property name="plugin-ids" type="array">
+      <value type="int" value="1"/>
+      <value type="int" value="2"/>
+      <value type="int" value="3"/>
+      <value type="int" value="4"/>
+      <value type="int" value="5"/>
+      <value type="int" value="6"/>
+    </property>
+  </property>
+  <property name="plugins">
+    <property name="plugin-1" type="string" value="applicationsmenu"/>
+    <property name="plugin-2" type="string" value="separator"/>
+    <property name="plugin-3" type="string" value="tasklist"/>
+    <property name="plugin-4" type="string" value="separator"/>
+    <property name="plugin-5" type="string" value="separator"/>
+    <property name="plugin-6" type="string" value="clock"/>
   </property>
 </channel>
 EOF
+
+
 
 # Set up Chrome policies
 mkdir -p /etc/opt/chrome/policies/managed
