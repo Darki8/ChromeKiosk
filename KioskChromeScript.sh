@@ -1,16 +1,32 @@
 #!/bin/bash
 
-apt install software-properties-common apt-transport-https ca-certificates curl -y
+# First Update System
+apt-get update && apt-get upgrade -y
+
+# Install All Required Packages 
+apt-get install -y \
+	feh \
+ 	unclutter \
+	xorg \
+	google-chrome-stable \
+	openbox \
+	lightdm \
+	locales \
+ 	software-properties-common \
+  	apt-transport-https \
+   	ca-certificates \
+    	curl \
+     	plymouth \
+      	plymouth-themes
+
+
 # Install Google Chrome
 curl -fSsL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome.gpg >> /dev/null
 echo deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main | sudo tee /etc/apt/sources.list.d/google-chrome.list
+apt-get update && apt-get install -y google-chrome-stable
 
-# Install plymouth
-apt install -y plymouth plymouth-themes
-# Set Theme to spinning wheel
+# Configure Plymouth 
 plymouth-set-default-theme -R spinner
-# Update grub
-update-grub2
 
 # Change GRUB settings
 if [ -e "/etc/default/grub" ]; then
@@ -18,36 +34,17 @@ if [ -e "/etc/default/grub" ]; then
   sed -i 's/GRUB_CMD_LINUX_DEFAULT="quiet"/GRUB_CMD_LINUX_DEFAULT="quiet splash"/' /etc/default/grub
 fi
 
-# Install feh for Background image
-apt install feh -y
+# Update grub
+update-grub
 
 
-# Update package list
-apt update
-
-# Install required software
-apt-get install -y \
-	unclutter \
-	xorg \
-	google-chrome-stable \
-	openbox \
-	lightdm \
-	locales
-
-# Create necessary directory
-mkdir -p /home/kiosk/.config/openbox
-
-# Create group if not exists
+# Setup kiosk user and environment
 getent group kiosk || groupadd kiosk
-
-# Create user if not exists
 id -u kiosk &>/dev/null || useradd -m kiosk -g kiosk -s /bin/bash 
-
-# Set correct ownership
+mkdir -p /home/kiosk/.config/openbox
 chown -R kiosk:kiosk /home/kiosk
-
-# Move Image from Current admin to kiosk
 mv "$(pwd)/Logo.png" /home/kiosk/Logo.png
+
 
 # Disable virtual console switching
 if [ -e "/etc/X11/xorg.conf" ]; then
@@ -107,12 +104,13 @@ do
 done &
 EOF
 
+
 # Create Chrome policy directory
 mkdir -p /etc/opt/chrome/policies/managed
 # Create Chrome policy for bookmarks and URL whitelist
 cat > /etc/opt/chrome/policies/managed/policy.json << EOF
 {
-  "URLAllowlist": ["chrome:*","https://sbb.ch/", "https://chefkoch.de/", "https://wikipedia.org/", "https://akad.ch/",  "https://vhs-lernportal.de/"],
+  "URLAllowlist": ["https://sbb.ch/", "https://chefkoch.de/", "https://wikipedia.org/", "https://akad.ch/",  "https://vhs-lernportal.de/"],
   "URLBlocklist": ["*"],
   "HomepageLocation": "https://sbb.ch/",
   "RestoreOnStartup": 4,
@@ -133,84 +131,36 @@ cat > /etc/opt/chrome/policies/managed/policy.json << EOF
   "BookmarkBarEnabled": true,
   "ImportBookmarks":false,
   "ManagedBookmarks": [
-    {
-      "name": "SBB",
-      "url": "https://www.sbb.ch/"
-    },
-    {
-      "name": "Chefkoch",
-      "url": "https://chefkoch.de/"
-    },
-    {
-      "name": "Wikipedia",
-      "url": "https://wikipedia.org/"
-    },
-    {
-      "name": "AKAD",
-      "url": "https://akad.ch/"
-    },
-    {
-      "name": "VHS-lernportal",
-      "url": "https://vhs-lernportal.de/"
-    }
+    {"name": "SBB","url": "https://www.sbb.ch/"},
+    {"name": "Chefkoch","url": "https://chefkoch.de/"},
+    {"name": "Wikipedia","url": "https://wikipedia.org/"},
+    {"name": "AKAD","url": "https://akad.ch/"},
+    {"name": "VHS-lernportal","url": "https://vhs-lernportal.de/"}
   ]
 }
 EOF
 
+# Create Chrome Bookmarks
 mkdir -p /home/kiosk/.config/google-chrome/Default
 cat > /home/kiosk/.config/google-chrome/Default/Bookmarks << EOF
 {
-   "checksum": "fe887b6e1145bdc61b6bafe20bdb81fa",
+"checksum": "fe887b6e1145bdc61b6bafe20bdb81fa",
    "roots": {
       "bookmark_bar": {
-         "children": [ {
-            "date_added": "13183642538941632",
-            "date_last_used": "0",
-            "guid": "00000000-0000-0000-0000-000000000001",
-            "id": "2",
-            "name": "Sbb",
-            "type": "url",
-            "url": "https://sbb.ch/"
-         }, {
-            "date_added": "13183642538941632",
-            "date_last_used": "0",
-            "guid": "00000000-0000-0000-0000-000000000002",
-            "id": "3",
-            "name": "Chefkoch",
-            "type": "url",
-            "url": "https://chefkoch.de/"
-         }, {
-            "date_added": "13183642538941632",
-            "date_last_used": "0",
-            "guid": "00000000-0000-0000-0000-000000000003",
-            "id": "4",
-            "name": "Wikipedia",
-            "type": "url",
-            "url": "https://wikipedia.org/"
-         }, {
-            "date_added": "13183642538941632",
-            "date_last_used": "0",
-            "guid": "00000000-0000-0000-0000-000000000004",
-            "id": "5",
-            "name": "AKAD",
-            "type": "url",
-            "url": "https://akad.ch/"
-         }, {
-            "date_added": "13183642538941632",
-            "date_last_used": "0",
-            "guid": "00000000-0000-0000-0000-000000000005",
-            "id": "6",
-            "name": "VHS-Lernportal",
-            "type": "url",
-            "url": "https://vhs-lernportal.de/"
-         } ],
-         "date_added": "13183642538941632",
-         "date_last_used": "0",
-         "date_modified": "13183642538941632",
-         "guid": "0bc5d13f-2cba-5d74-951f-3f233fe6c908",
-         "id": "1",
-         "name": "Lesezeichenleiste",
-         "type": "folder"
+        "children": [ 
+	 	{"date_added": "13183642538941632","date_last_used": "0","guid": "00000000-0000-0000-0000-000000000001","id": "2","name": "Sbb","type": "url","url": "https://sbb.ch/"},
+   		{"date_added": "13183642538941632","date_last_used": "0","guid": "00000000-0000-0000-0000-000000000002","id": "3","name": "Chefkoch","type": "url","url": "https://chefkoch.de/"}, 
+     		{"date_added": "13183642538941632","date_last_used": "0","guid": "00000000-0000-0000-0000-000000000003","id": "4","name": "Wikipedia","type": "url","url": "https://wikipedia.org/"}, 
+	 	{"date_added": "13183642538941632","date_last_used": "0","guid": "00000000-0000-0000-0000-000000000004","id": "5","name": "AKAD","type": "url","url": "https://akad.ch/"}, 
+		{"date_added": "13183642538941632","date_last_used": "0","guid": "00000000-0000-0000-0000-000000000005","id": "6","name": "VHS-Lernportal","type": "url","url": "https://vhs-lernportal.de/"} 
+  	],
+        "date_added": "13183642538941632",
+        "date_last_used": "0",
+        "date_modified": "13183642538941632",
+        "guid": "0bc5d13f-2cba-5d74-951f-3f233fe6c908",
+        "id": "1",
+        "name": "Lesezeichenleiste",
+        "type": "folder"
       },
       "other": {
          "children": [  ],
@@ -237,7 +187,8 @@ cat > /home/kiosk/.config/google-chrome/Default/Bookmarks << EOF
 }
 EOF
 
+
 # Set ownership of Chrome policy directory
-chown -R kiosk:kiosk /etc/opt/chrome/policies/managed
+chown -R kiosk:kiosk /etc/opt/chrome/policies/managed /home/kiosk/.config
 echo "Done!"
 
