@@ -6,7 +6,6 @@ apt-get update && apt-get upgrade -y
 # Install Required Packages 
 apt-get install -y \
   xorg \
-  openbox \
   sddm \
   locales \
   software-properties-common \
@@ -16,13 +15,10 @@ apt-get install -y \
   plymouth \
   plymouth-themes \
   gvfs-backends \
-  udiskie
-
-# Install KDE Plasma Desktop Environment
-apt-get install -y kde-plasma-desktop
-
-# Install LibreOffice Writer only
-apt-get install -y libreoffice-writer
+  udiskie \
+  policykit-1 \
+  kde-plasma-desktop \
+  libreoffice-writer
 
 # Install Google Chrome
 curl -fSsL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome.gpg >> /dev/null
@@ -44,7 +40,7 @@ update-grub
 # Setup kiosk user and environment
 getent group kiosk || groupadd kiosk
 id -u kiosk &>/dev/null || useradd -m kiosk -g kiosk -s /bin/bash 
-mkdir -p /home/kiosk/.config/openbox
+mkdir -p /home/kiosk/.config/autostart
 chown -R kiosk:kiosk /home/kiosk
 
 if [ -e "/etc/sddm.conf" ]; then
@@ -135,23 +131,6 @@ chown -R kiosk:kiosk /etc/opt/chrome/policies/managed /home/kiosk/.config
 chown kiosk:kiosk /home/kiosk/Desktop/*.desktop
 chmod +x /home/kiosk/Desktop/*.desktop
 
-# Lock down the system by configuring Openbox to restrict access
-cat > /home/kiosk/.config/openbox/autostart << EOF
-# Disable screensaver and power management
-xset s off
-xset s noblank
-xset -dpms
-
-# Start Google Chrome
-google-chrome &
-
-# Start LibreOffice Writer
-libreoffice --writer &
-
-# Start udiskie for automounting USB devices
-udiskie &
-EOF
-
 # Allow access to common directories
 mkdir -p /home/kiosk/Documents /home/kiosk/Downloads
 chown -R kiosk:kiosk /home/kiosk/Documents /home/kiosk/Downloads
@@ -160,35 +139,43 @@ chown -R kiosk:kiosk /home/kiosk/Documents /home/kiosk/Downloads
 echo "kiosk ALL=(ALL) NOPASSWD: /usr/bin/libreoffice, /usr/bin/google-chrome" | sudo tee /etc/sudoers.d/kiosk
 chmod 0440 /etc/sudoers.d/kiosk
 
-# Disable switching users, shutdown, and reboot options
-echo "[Disable Ctrl+Alt+Del]
-[Enable Ctrl+Alt+Backspace]
-# Disable hibernation and suspend
-HandleSuspendKey=ignore
-HandleHibernateKey=ignore
-HandleLidSwitch=ignore
-# Disable user switching
-allow-guest=false
-greeter-hide-users=true
-greeter-show-manual-login=true
-session-setup-script=/usr/share/setup-session.sh" | sudo tee -a /etc/lightdm/lightdm.conf
-
-# Create session setup script
-cat > /usr/share/setup-session.sh << EOF
-#!/bin/bash
-# Disable user switching and other session options
-gsettings set org.gnome.desktop.lockdown disable-user-switching true
-gsettings set org.gnome.desktop.lockdown disable-log-out true
-gsettings set org.gnome.desktop.lockdown disable-lock-screen true
+# Disable switching users, shutdown, and reboot options in KDE Plasma
+mkdir -p /etc/kde5
+cat > /etc/kde5/kioskrc << EOF
+[KDE Action Restrictions][$i]
+logout=false
+lock_screen=false
+switch_user=false
+suspend=false
+hibernate=false
+reboot=false
+poweroff=false
 EOF
-chmod +x /usr/share/setup-session.sh
 
-# Lock down KDE Plasma settings
-cat > /etc/xdg/plasma-workspace/lockdown/desktop-files.policy << EOF
-[org.kde.konqueror]
-restrict=false
-[org.kde.systemsettings]
-restrict=true
+# Apply restrictions to KDE Plasma
+cat > /etc/xdg/kdeglobals << EOF
+[KDE Action Restrictions]
+logout=false
+lock_screen=false
+switch_user=false
+suspend=false
+hibernate=false
+reboot=false
+poweroff=false
+EOF
+
+# Setup udiskie for automounting USB devices
+cat > /home/kiosk/.config/autostart/udiskie.desktop << EOF
+[Desktop Entry]
+Type=Application
+Exec=udiskie
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=udiskie
+Name=udiskie
+Comment[en_US]=Automount USB devices
+Comment=Automount USB devices
 EOF
 
 echo "Done!"
