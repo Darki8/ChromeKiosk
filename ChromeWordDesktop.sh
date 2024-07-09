@@ -3,30 +3,31 @@
 # First Update System
 apt-get update && apt-get upgrade -y
 
-# Install All Required Packages 
+# Install Required Packages 
 apt-get install -y \
-	xorg \
-	openbox \
-	sddm \
-	locales \
- 	software-properties-common \
+  xorg \
+  openbox \
+  sddm \
+  locales \
+  software-properties-common \
   apt-transport-https \
   ca-certificates \
   curl \
   plymouth \
-  plymouth-themes
+  plymouth-themes \
+  gvfs-backends \
+  udiskie
 
 # Install KDE Plasma Desktop Environment
 apt-get install -y kde-plasma-desktop
 
-# Install LibreOffice
-apt-get install -y libreoffice
+# Install LibreOffice Writer only
+apt-get install -y libreoffice-writer
 
 # Install Google Chrome
 curl -fSsL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome.gpg >> /dev/null
 echo deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main | sudo tee /etc/apt/sources.list.d/google-chrome.list
 apt-get update && apt-get install -y google-chrome-stable
-
 
 # Configure Plymouth 
 plymouth-set-default-theme -R spinner
@@ -40,13 +41,11 @@ fi
 # Update grub
 update-grub
 
-
 # Setup kiosk user and environment
 getent group kiosk || groupadd kiosk
 id -u kiosk &>/dev/null || useradd -m kiosk -g kiosk -s /bin/bash 
 mkdir -p /home/kiosk/.config/openbox
 chown -R kiosk:kiosk /home/kiosk
-
 
 if [ -e "/etc/sddm.conf" ]; then
   mv /etc/sddm.conf /etc/sddm.conf.backup
@@ -56,8 +55,6 @@ cat > /etc/sddm.conf << EOF
 User=kiosk
 Session=plasma.desktop
 EOF
-
-mkdir -p /home/kiosk/Desktop/
 
 # Create desktop shortcut for Google Chrome
 cat > /home/kiosk/Desktop/Google-Chrome.desktop << EOF
@@ -96,39 +93,6 @@ Icon=libreoffice-writer
 Terminal=false
 EOF
 
-# Create desktop shortcut for LibreOffice Calc
-cat > /home/kiosk/Desktop/LibreOffice-Calc.desktop << EOF
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=LibreOffice Calc
-Exec=libreoffice --calc
-Icon=libreoffice-calc
-Terminal=false
-EOF
-
-# Create desktop shortcut for LibreOffice Impress
-cat > /home/kiosk/Desktop/LibreOffice-Impress.desktop << EOF
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=LibreOffice Impress
-Exec=libreoffice --impress
-Icon=libreoffice-impress
-Terminal=false
-EOF
-
-# Create desktop shortcut for LibreOffice Draw
-cat > /home/kiosk/Desktop/LibreOffice-Draw.desktop << EOF
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=LibreOffice Draw
-Exec=libreoffice --draw
-Icon=libreoffice-draw
-Terminal=false
-EOF
-
 # Create Chrome policy directory
 mkdir -p /etc/opt/chrome/policies/managed
 # Create Chrome policy for bookmarks and URL whitelist
@@ -164,61 +128,67 @@ cat > /etc/opt/chrome/policies/managed/policy.json << EOF
 }
 EOF
 
-
-# Create Chrome Bookmarks
-mkdir -p /home/kiosk/.config/google-chrome/Default
-cat > /home/kiosk/.config/google-chrome/Default/Bookmarks << EOF
-{
-"checksum": "fe887b6e1145bdc61b6bafe20bdb81fa",
-   "roots": {
-      "bookmark_bar": {
-        "children": [ 
-	 	{"date_added": "13183642538941632","date_last_used": "0","guid": "00000000-0000-0000-0000-000000000001","id": "2","name": "Sbb","type": "url","url": "https://sbb.ch/"},
-   		{"date_added": "13183642538941632","date_last_used": "0","guid": "00000000-0000-0000-0000-000000000002","id": "3","name": "Chefkoch","type": "url","url": "https://chefkoch.de/"}, 
-     		{"date_added": "13183642538941632","date_last_used": "0","guid": "00000000-0000-0000-0000-000000000003","id": "4","name": "Wikipedia","type": "url","url": "https://wikipedia.org/"}, 
-	 	{"date_added": "13183642538941632","date_last_used": "0","guid": "00000000-0000-0000-0000-000000000004","id": "5","name": "AKAD","type": "url","url": "https://akad.ch/"}, 
-		{"date_added": "13183642538941632","date_last_used": "0","guid": "00000000-0000-0000-0000-000000000005","id": "6","name": "VHS-Lernportal","type": "url","url": "https://vhs-lernportal.de/"} 
-  	],
-        "date_added": "13183642538941632",
-        "date_last_used": "0",
-        "date_modified": "13183642538941632",
-        "guid": "0bc5d13f-2cba-5d74-951f-3f233fe6c908",
-        "id": "1",
-        "name": "Lesezeichenleiste",
-        "type": "folder"
-      },
-      "other": {
-         "children": [  ],
-         "date_added": "13183642538941632",
-         "date_last_used": "0",
-         "date_modified": "13183642538941632",
-         "guid": "82b081ec-3dd3-529c-8475-ab6c344590dd",
-         "id": "7",
-         "name": "Weitere Lesezeichen",
-         "type": "folder"
-      },
-      "synced": {
-         "children": [  ],
-         "date_added": "13183642538941632",
-         "date_last_used": "0",
-         "date_modified": "13183642538941632",
-         "guid": "4cf2e351-0e85-532b-bb37-df045d8f8d0f",
-         "id": "8",
-         "name": "Mobile Lesezeichen",
-         "type": "folder"
-      }
-   },
-   "version": 1
-}
-EOF
-
-
 # Set ownership of Chrome policy directory
 chown -R kiosk:kiosk /etc/opt/chrome/policies/managed /home/kiosk/.config
-
 
 # Set permissions for desktop shortcuts
 chown kiosk:kiosk /home/kiosk/Desktop/*.desktop
 chmod +x /home/kiosk/Desktop/*.desktop
+
+# Lock down the system by configuring Openbox to restrict access
+cat > /home/kiosk/.config/openbox/autostart << EOF
+# Disable screensaver and power management
+xset s off
+xset s noblank
+xset -dpms
+
+# Start Google Chrome
+google-chrome &
+
+# Start LibreOffice Writer
+libreoffice --writer &
+
+# Start udiskie for automounting USB devices
+udiskie &
+EOF
+
+# Allow access to common directories
+mkdir -p /home/kiosk/Documents /home/kiosk/Downloads
+chown -R kiosk:kiosk /home/kiosk/Documents /home/kiosk/Downloads
+
+# Restrict user permissions
+echo "kiosk ALL=(ALL) NOPASSWD: /usr/bin/libreoffice, /usr/bin/google-chrome" | sudo tee /etc/sudoers.d/kiosk
+chmod 0440 /etc/sudoers.d/kiosk
+
+# Disable switching users, shutdown, and reboot options
+echo "[Disable Ctrl+Alt+Del]
+[Enable Ctrl+Alt+Backspace]
+# Disable hibernation and suspend
+HandleSuspendKey=ignore
+HandleHibernateKey=ignore
+HandleLidSwitch=ignore
+# Disable user switching
+allow-guest=false
+greeter-hide-users=true
+greeter-show-manual-login=true
+session-setup-script=/usr/share/setup-session.sh" | sudo tee -a /etc/lightdm/lightdm.conf
+
+# Create session setup script
+cat > /usr/share/setup-session.sh << EOF
+#!/bin/bash
+# Disable user switching and other session options
+gsettings set org.gnome.desktop.lockdown disable-user-switching true
+gsettings set org.gnome.desktop.lockdown disable-log-out true
+gsettings set org.gnome.desktop.lockdown disable-lock-screen true
+EOF
+chmod +x /usr/share/setup-session.sh
+
+# Lock down KDE Plasma settings
+cat > /etc/xdg/plasma-workspace/lockdown/desktop-files.policy << EOF
+[org.kde.konqueror]
+restrict=false
+[org.kde.systemsettings]
+restrict=true
+EOF
 
 echo "Done!"
