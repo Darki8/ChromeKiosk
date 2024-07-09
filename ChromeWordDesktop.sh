@@ -24,8 +24,8 @@ apt-get install -y \
 apt-get remove -y plasma-discover
 
 # Install Google Chrome
-curl -fSsL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome.gpg >> /dev/null
-echo deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main | sudo tee /etc/apt/sources.list.d/google-chrome.list
+curl -fSsL https://dl.google.com/linux/linux_signing_key.pub | gpg --dearmor | tee /usr/share/keyrings/google-chrome.gpg > /dev/null
+echo deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main | tee /etc/apt/sources.list.d/google-chrome.list
 apt-get update && apt-get install -y google-chrome-stable
 
 # Configure Plymouth 
@@ -43,12 +43,9 @@ update-grub
 # Setup kiosk user and environment
 getent group kiosk || groupadd kiosk
 id -u kiosk &>/dev/null || useradd -m kiosk -g kiosk -s /bin/bash 
-mkdir -p /home/kiosk/.config/autostart
-chown -R kiosk:kiosk /home/kiosk
+mkdir -p /home/kiosk/.config/autostart /home/kiosk/Desktop /home/kiosk/Documents /home/kiosk/Downloads
 
-if [ -e "/etc/sddm.conf" ]; then
-  mv /etc/sddm.conf /etc/sddm.conf.backup
-fi
+# Create SDDM config for auto-login
 cat > /etc/sddm.conf << EOF
 [Autologin]
 User=kiosk
@@ -104,19 +101,19 @@ cat > /etc/opt/chrome/policies/managed/policy.json << EOF
   "RestoreOnStartupURLs": ["https://sbb.ch/"],
   "PasswordManagerEnabled": false,
   "SavingBrowserHistoryDisabled": true,
-  "BrowserAddPersonEnabled":false,
-  "BrowserGuestModeEnabled":false,
-  "BrowserSignin":0,
-  "PrintingEnabled":false,
-  "DeveloperToolsAvailability":2,
-  "TaskManagerEndProcessEnabled":false,
-  "DownloadRestrictions":3,
-  "SharedClipboardEnabled":false,
-  "NewTabPageLocation":"google.com",
-  "SearchSuggestEnabled":false,
-  "EditBookmarksEnabled":false,
+  "BrowserAddPersonEnabled": false,
+  "BrowserGuestModeEnabled": false,
+  "BrowserSignin": 0,
+  "PrintingEnabled": false,
+  "DeveloperToolsAvailability": 2,
+  "TaskManagerEndProcessEnabled": false,
+  "DownloadRestrictions": 3,
+  "SharedClipboardEnabled": false,
+  "NewTabPageLocation": "google.com",
+  "SearchSuggestEnabled": false,
+  "EditBookmarksEnabled": false,
   "BookmarkBarEnabled": true,
-  "ImportBookmarks":false,
+  "ImportBookmarks": false,
   "ManagedBookmarks": [
     {"name": "SBB","url": "https://www.sbb.ch/"},
     {"name": "Chefkoch","url": "https://chefkoch.de/"},
@@ -127,15 +124,15 @@ cat > /etc/opt/chrome/policies/managed/policy.json << EOF
 }
 EOF
 
-# Set ownership of Chrome policy directory
-chown -R kiosk:kiosk /etc/opt/chrome/policies/managed /home/kiosk/.config
+# Set ownership of directories and files
+chown -R kiosk:kiosk /home/kiosk
+chown -R root:root /etc/opt/chrome/policies
 
-# Allow access to common directories
-mkdir -p /home/kiosk/Documents /home/kiosk/Downloads
-chown -R kiosk:kiosk /home/kiosk/Documents /home/kiosk/Downloads
+# Set permissions for desktop shortcuts
+chmod +x /home/kiosk/Desktop/*.desktop
 
 # Restrict user permissions
-echo "kiosk ALL=(ALL) NOPASSWD: /usr/bin/libreoffice, /usr/bin/google-chrome" | sudo tee /etc/sudoers.d/kiosk
+echo "kiosk ALL=(ALL) NOPASSWD: /usr/bin/libreoffice, /usr/bin/google-chrome" | tee /etc/sudoers.d/kiosk
 chmod 0440 /etc/sudoers.d/kiosk
 
 # Disable switching users, shutdown, and reboot options in KDE Plasma
@@ -149,6 +146,15 @@ suspend=false
 hibernate=false
 reboot=false
 poweroff=false
+show_system_settings=false
+show_network_settings=false
+show_loginout=false
+show_new_session=false
+show_quit=false
+show_recent_documents=false
+show_search=false
+show_time=false
+show_trash=false
 EOF
 
 # Apply restrictions to KDE Plasma
@@ -164,7 +170,6 @@ poweroff=false
 EOF
 
 # Prevent access to System Settings
-mkdir -p /etc/kde5
 cat > /etc/kde5/systemsettingsrc << EOF
 [KDE Action Restrictions][$i]
 systemsettings=false
@@ -193,21 +198,6 @@ Comment[en_US]=Automount USB devices
 Comment=Automount USB devices
 EOF
 
-# Lock down the application menu
-mkdir -p /etc/kde5
-cat > /etc/kde5/kioskrc << EOF
-[KDE Action Restrictions][$i]
-show_system_settings=false
-show_network_settings=false
-show_loginout=false
-show_new_session=false
-show_quit=false
-show_recent_documents=false
-show_search=false
-show_time=false
-show_trash=false
-EOF
-
 # Restrict access to specific applications
 cat > /etc/xdg/plasma-workspace/env/kde-app-restrictions.sh << EOF
 #!/bin/bash
@@ -222,15 +212,6 @@ if [ "\$USER" == "kiosk" ]; then
   kwriteconfig5 --file kioslaverc --group "KDE Action Restrictions" --key "access_kmenuedit" false
 fi
 EOF
-
 chmod +x /etc/xdg/plasma-workspace/env/kde-app-restrictions.sh
 
-# Set permissions for desktop shortcuts
-mkdir -p /home/kiosk/Desktop 
-chown kiosk:kiosk /home/kiosk/Desktop/*.desktop
-chmod +x /home/kiosk/Desktop/*.desktop
-
-
 echo "Done!"
-
-
