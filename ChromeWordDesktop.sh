@@ -45,8 +45,6 @@ getent group kiosk || groupadd kiosk
 id -u kiosk &>/dev/null || useradd -m kiosk -g kiosk -s /bin/bash 
 mkdir -p /home/kiosk/.config/autostart
 chown -R kiosk:kiosk /home/kiosk
-mkdir -p /home/kiosk/Desktop
-chown -R kiosk:kiosk /home/kiosk/Desktop
 
 if [ -e "/etc/sddm.conf" ]; then
   mv /etc/sddm.conf /etc/sddm.conf.backup
@@ -132,10 +130,6 @@ EOF
 # Set ownership of Chrome policy directory
 chown -R kiosk:kiosk /etc/opt/chrome/policies/managed /home/kiosk/.config
 
-# Set permissions for desktop shortcuts
-chown kiosk:kiosk /home/kiosk/Desktop/*.desktop
-chmod +x /home/kiosk/Desktop/*.desktop
-
 # Allow access to common directories
 mkdir -p /home/kiosk/Documents /home/kiosk/Downloads
 chown -R kiosk:kiosk /home/kiosk/Documents /home/kiosk/Downloads
@@ -176,7 +170,16 @@ cat > /etc/kde5/systemsettingsrc << EOF
 systemsettings=false
 EOF
 
-# Setup udiskie for automounting USB devices
+# Configure KDE Kiosk mode
+mkdir -p /etc/xdg/plasma-workspace/env
+cat > /etc/xdg/plasma-workspace/env/kde-kiosk.sh << EOF
+#!/bin/bash
+export KDE_SESSION_VERSION=5
+export KDE_FULL_SESSION=true
+EOF
+chmod +x /etc/xdg/plasma-workspace/env/kde-kiosk.sh
+
+# Configure Autostart for udiskie
 cat > /home/kiosk/.config/autostart/udiskie.desktop << EOF
 [Desktop Entry]
 Type=Application
@@ -190,13 +193,44 @@ Comment[en_US]=Automount USB devices
 Comment=Automount USB devices
 EOF
 
-# Set KDE Plasma Kiosk settings
-mkdir -p /etc/xdg/plasma-workspace/env
-cat > /etc/xdg/plasma-workspace/env/kde-kiosk.sh << EOF
-#!/bin/bash
-export KDE_SESSION_VERSION=5
-export KDE_FULL_SESSION=true
+# Lock down the application menu
+mkdir -p /etc/kde5
+cat > /etc/kde5/kioskrc << EOF
+[KDE Action Restrictions][$i]
+show_system_settings=false
+show_network_settings=false
+show_loginout=false
+show_new_session=false
+show_quit=false
+show_recent_documents=false
+show_search=false
+show_time=false
+show_trash=false
 EOF
-chmod +x /etc/xdg/plasma-workspace/env/kde-kiosk.sh
+
+# Restrict access to specific applications
+cat > /etc/xdg/plasma-workspace/env/kde-app-restrictions.sh << EOF
+#!/bin/bash
+if [ "\$USER" == "kiosk" ]; then
+  export KDE_NO_GLOBAL_MENU=1
+  export QT_QUICK_CONTROLS_STYLE=basic
+  export PLASMA_USE_QT_SCALING=1
+  kwriteconfig5 --file kioslaverc --group "KDE Action Restrictions" --key "shell_access" false
+  kwriteconfig5 --file kioslaverc --group "KDE Action Restrictions" --key "run_command" false
+  kwriteconfig5 --file kioslaverc --group "KDE Action Restrictions" --key "open_with" false
+  kwriteconfig5 --file kioslaverc --group "KDE Action Restrictions" --key "open_terminal" false
+  kwriteconfig5 --file kioslaverc --group "KDE Action Restrictions" --key "access_kmenuedit" false
+fi
+EOF
+
+chmod +x /etc/xdg/plasma-workspace/env/kde-app-restrictions.sh
+
+# Set permissions for desktop shortcuts
+mkdir -p /home/kiosk/Desktop 
+chown kiosk:kiosk /home/kiosk/Desktop/*.desktop
+chmod +x /home/kiosk/Desktop/*.desktop
+
 
 echo "Done!"
+
+
