@@ -140,33 +140,24 @@ chmod +x /home/kiosk/Desktop/*.desktop
 mkdir -p /home/kiosk/Documents /home/kiosk/Downloads
 chown -R kiosk:kiosk /home/kiosk/Documents /home/kiosk/Downloads
 
-# Restrict user permissions
-echo "kiosk ALL=(ALL) NOPASSWD: /usr/bin/libreoffice, /usr/bin/google-chrome" | sudo tee /etc/sudoers.d/kiosk
-chmod 0440 /etc/sudoers.d/kiosk
-
-# Disable switching users, shutdown, and reboot options in KDE Plasma
-mkdir -p /etc/kde5
-cat > /etc/kde5/kioskrc << EOF
+# Disable switching users, hibernate, and sleep options in KDE Plasma
+mkdir -p /etc/xdg
+cat > /etc/xdg/kdeglobals << EOF
 [KDE Action Restrictions][$i]
-logout=false
-lock_screen=false
-switch_user=false
-suspend=false
-hibernate=false
-reboot=false
-poweroff=false
+action/lock_screen=false
+action/start_new_session=false
+action/switch_user=false
+action/sleep=false
+action/hibernate=false
 EOF
 
-# Apply restrictions to KDE Plasma
-cat > /etc/xdg/kdeglobals << EOF
-[KDE Action Restrictions]
-logout=false
-lock_screen=false
-switch_user=false
-suspend=false
-hibernate=false
-reboot=false
-poweroff=false
+# Prevent access to specific System Settings modules
+mkdir -p /etc/xdg/kiosk
+cat > /etc/xdg/kiosk/kioskrc << EOF
+[KDE Control Module Restrictions][$i]
+kcm_powerdevilprofilesconfig.desktop=false
+kcm_powerdevilactivitiesconfig.desktop=false
+powerdevilglobalconfig.desktop=false
 EOF
 
 # Prevent access to System Settings
@@ -175,6 +166,9 @@ cat > /etc/kde5/systemsettingsrc << EOF
 [KDE Action Restrictions][$i]
 systemsettings=false
 EOF
+
+# Disable sleep and hibernate at system level
+systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 
 # Setup udiskie for automounting USB devices
 cat > /home/kiosk/.config/autostart/udiskie.desktop << EOF
