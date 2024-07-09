@@ -20,6 +20,9 @@ apt-get install -y \
   kde-plasma-desktop \
   libreoffice-writer
 
+# Remove Discover
+apt-get remove -y plasma-discover
+
 # Install Google Chrome
 curl -fSsL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome.gpg >> /dev/null
 echo deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] http://dl.google.com/linux/chrome/deb/ stable main | sudo tee /etc/apt/sources.list.d/google-chrome.list
@@ -42,6 +45,8 @@ getent group kiosk || groupadd kiosk
 id -u kiosk &>/dev/null || useradd -m kiosk -g kiosk -s /bin/bash 
 mkdir -p /home/kiosk/.config/autostart
 chown -R kiosk:kiosk /home/kiosk
+mkdir -p /home/kiosk/Desktop
+chown -R kiosk:kiosk /home/kiosk/Desktop
 
 if [ -e "/etc/sddm.conf" ]; then
   mv /etc/sddm.conf /etc/sddm.conf.backup
@@ -164,6 +169,13 @@ reboot=false
 poweroff=false
 EOF
 
+# Prevent access to System Settings
+mkdir -p /etc/kde5
+cat > /etc/kde5/systemsettingsrc << EOF
+[KDE Action Restrictions][$i]
+systemsettings=false
+EOF
+
 # Setup udiskie for automounting USB devices
 cat > /home/kiosk/.config/autostart/udiskie.desktop << EOF
 [Desktop Entry]
@@ -177,5 +189,14 @@ Name=udiskie
 Comment[en_US]=Automount USB devices
 Comment=Automount USB devices
 EOF
+
+# Set KDE Plasma Kiosk settings
+mkdir -p /etc/xdg/plasma-workspace/env
+cat > /etc/xdg/plasma-workspace/env/kde-kiosk.sh << EOF
+#!/bin/bash
+export KDE_SESSION_VERSION=5
+export KDE_FULL_SESSION=true
+EOF
+chmod +x /etc/xdg/plasma-workspace/env/kde-kiosk.sh
 
 echo "Done!"
