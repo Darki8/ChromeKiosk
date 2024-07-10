@@ -99,7 +99,7 @@ mkdir -p /etc/opt/chrome/policies/managed
 # Create Chrome policy for bookmarks and URL whitelist
 cat > /etc/opt/chrome/policies/managed/policy.json << EOF
 {
-  "URLAllowlist": ["https://sbb.ch/", "https://chefkoch.de/", "https://wikipedia.org/", "https://akad.ch/",  "https://vhs-lernportal.de/"],
+  "URLAllowlist": ["chrome://", "https://sbb.ch/", "https://chefkoch.de/", "https://wikipedia.org/", "https://akad.ch/",  "https://vhs-lernportal.de/"],
   "URLBlocklist": ["*"],
   "HomepageLocation": "https://sbb.ch/",
   "RestoreOnStartup": 4,
@@ -142,7 +142,7 @@ chown -R kiosk:kiosk /home/kiosk/Documents /home/kiosk/Downloads
 
 # Disable switching users, hibernate, and sleep options in KDE Plasma
 mkdir -p /etc/xdg
-cat > /etc/xdg/kdeglobals << EOF
+cat > /home/kiosk/.config/kdeglobals << EOF
 [KDE Action Restrictions][$i]
 action/lock_screen=false
 action/start_new_session=false
@@ -152,6 +152,10 @@ action/hibernate=false
 shell_access=false
 action/run_command=false
 run_command=false
+action/properties=false
+action/file_properties=false
+action/dolphin/properties=false
+action/file/properties=false
 EOF
 
 # Prevent access to specific System Settings modules
@@ -163,8 +167,12 @@ kcm_powerdevilactivitiesconfig.desktop=false
 powerdevilglobalconfig.desktop=false
 EOF
 
-# Disable sleep and hibernate at system level
-systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
+# disable autolock
+cat > /home/kiosk/.config/kscreenlockerrc << EOF
+[Daemon]
+Autolock=false
+EOF
+
 
 # Setup udiskie for automounting USB devices
 cat > /home/kiosk/.config/autostart/udiskie.desktop << EOF
