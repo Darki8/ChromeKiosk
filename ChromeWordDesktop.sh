@@ -64,7 +64,23 @@ cat > /home/kiosk/Desktop/Google-Chrome.desktop << EOF
 Version=1.0
 Type=Application
 Name=Google Chrome
-Exec=/usr/bin/google-chrome
+Exec=/usr/bin/google-chrome \
+    --no-first-run \
+    --start-maximized \
+    --incognito \
+    --force-app-mode \
+    --no-message-box \
+    --disable-translate \
+    --disable-infobars \
+    --disable-suggestions-service \
+    --disable-save-password-bubble \
+    --disable-session-crashed-bubble \
+    --disable-plugins \
+    --disable-sync \
+    --no-default-browser-check \
+    --password-store=basic \
+    --disable-extensions \
+    --user-data-dir=/home/kiosk/.config/google-chrome
 Icon=google-chrome
 Terminal=false
 EOF
