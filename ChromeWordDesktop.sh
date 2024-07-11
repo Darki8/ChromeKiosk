@@ -18,7 +18,8 @@ apt-get install -y \
   udiskie \
   policykit-1 \
   kde-plasma-desktop \
-  libreoffice-writer
+  libreoffice-writer \
+  firefox-esr
 
 # Remove Discover
 apt-get remove -y plasma-discover
@@ -83,6 +84,43 @@ EOF
 chown kiosk:kiosk /home/kiosk/Desktop/*.desktop
 chmod +x /home/kiosk/Desktop/*.desktop
 
+# Chrome Policy Setup
+mkdir -p /etc/opt/chrome/policies/managed
+cat > /etc/opt/chrome/policies/managed/policy.json << EOF
+{
+  "URLAllowlist": ["chrome://", "https://sbb.ch/", "https://chefkoch.de/", "https://wikipedia.org/", "https://akad.ch/",  "https://vhs-lernportal.de/"],
+  "URLBlocklist": ["*"],
+  "HomepageLocation": "https://sbb.ch/",
+  "RestoreOnStartup": 4,
+  "RestoreOnStartupURLs": ["https://sbb.ch/"],
+  "PasswordManagerEnabled": false,
+  "SavingBrowserHistoryDisabled": true,
+  "BrowserAddPersonEnabled":false,
+  "BrowserGuestModeEnabled":false,
+  "BrowserSignin":0,
+  "PrintingEnabled":false,
+  "DeveloperToolsAvailability":2,
+  "TaskManagerEndProcessEnabled":false,
+  "DownloadRestrictions":3,
+  "SharedClipboardEnabled":false,
+  "NewTabPageLocation":"google.com",
+  "SearchSuggestEnabled":false,
+  "EditBookmarksEnabled":false,
+  "BookmarkBarEnabled": true,
+  "ImportBookmarks":false,
+  "ManagedBookmarks": [
+    {"name": "SBB","url": "https://www.sbb.ch/"},
+    {"name": "Chefkoch","url": "https://chefkoch.de/"},
+    {"name": "Wikipedia","url": "https://wikipedia.org/"},
+    {"name": "AKAD","url": "https://akad.ch/"},
+    {"name": "VHS-lernportal","url": "https://vhs-lernportal.de/"}
+  ]
+}
+EOF
+
+# Set ownership of Chrome policy directory
+chown -R kiosk:kiosk /etc/opt/chrome/policies/managed /home/kiosk/.config
+
 # Allow access to common directories
 mkdir -p /home/kiosk/Documents /home/kiosk/Downloads
 chown -R kiosk:kiosk /home/kiosk/Documents /home/kiosk/Downloads
@@ -114,7 +152,7 @@ kcm_powerdevilactivitiesconfig.desktop=false
 powerdevilglobalconfig.desktop=false
 EOF
 
-# disable autolock
+# Disable autolock
 cat > /home/kiosk/.config/kscreenlockerrc << EOF
 [Daemon]
 Autolock=false
@@ -143,17 +181,7 @@ export KDE_FULL_SESSION=true
 EOF
 chmod +x /etc/xdg/plasma-workspace/env/kde-kiosk.sh
 
-# Configure KDE Plasma panel and desktop restrictions
-mkdir -p /home/kiosk/.config/plasma-workspace/env
-cat > /home/kiosk/.config/plasma-workspace/env/plasma-kiosk.sh << EOF
-#!/bin/bash
-export KDE_SESSION_VERSION=5
-export KDE_FULL_SESSION=true
-EOF
-
-chmod +x /home/kiosk/.config/plasma-workspace/env/plasma-kiosk.sh
-
-# Configure Plasma desktop and panel layout
+# Configure KDE Plasma panel and desktop layout
 cat > /home/kiosk/.config/plasma-org.kde.plasma.desktop-appletsrc << EOF
 [ActionPlugins][0]
 RightButton;NoModifier=org.kde.contextmenu
