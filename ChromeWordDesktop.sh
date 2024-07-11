@@ -21,8 +21,8 @@ apt-get install -y \
   libreoffice-writer \
   firefox-esr
 
-# Remove Discover
-apt-get remove -y plasma-discover
+# Remove Discover and other unnecessary packages
+apt-get remove -y plasma-discover konsole dolphin kwrite kmail
 
 # Install Google Chrome
 curl -fSsL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome.gpg > /dev/null
@@ -264,6 +264,33 @@ plugin=org.kde.plasma.networkmanagement
 itemsOnDisabledScreens=
 screenMapping=desktop:/Google-Chrome.desktop,0,3c740d54-fc8d-4064-86da-42ebb23a559d,desktop:/LibreOffice-Writer.desktop,0,3c740d54-fc8d-4064-86da-42ebb23a559d
 EOF
+
+# Remove unnecessary software from the application launcher and hide options
+cat > /home/kiosk/.config/kdeglobals << EOF
+[KDE]
+SingleClick=false
+
+[KDE Action Restrictions][$i]
+action/lock_screen=false
+action/start_new_session=false
+action/switch_user=false
+action/sleep=false
+action/hibernate=false
+action/logout=false
+shell_access=false
+action/run_command=false
+run_command=false
+action/properties=false
+action/file_properties=false
+action/dolphin/properties=false
+action/file/properties=false
+EOF
+
+# Remove or hide unwanted applications in the launcher
+rm -f /usr/share/applications/kmail.desktop \
+      /usr/share/applications/konsole.desktop \
+      /usr/share/applications/kwrite.desktop \
+      /usr/share/applications/org.kde.dolphin.desktop
 
 # Set permissions for the config files
 chown -R kiosk:kiosk /home/kiosk/.config
