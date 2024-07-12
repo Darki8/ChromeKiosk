@@ -22,7 +22,7 @@ apt-get install -y \
   firefox-esr
 
 # Remove Discover and other unnecessary packages
-apt-get remove -y plasma-discover konsole dolphin kwrite kmail
+apt-get remove -y plasma-discover 
 
 # Install Google Chrome
 curl -fSsL https://dl.google.com/linux/linux_signing_key.pub | sudo gpg --dearmor | sudo tee /usr/share/keyrings/google-chrome.gpg > /dev/null
@@ -253,15 +253,15 @@ plugin=org.kde.panel
 wallpaperplugin=org.kde.image
 
 [Containments][2][Applets][20]
-immutability=1
+immutability=2
 plugin=org.kde.plasma.kickoff
 
 [Containments][2][Applets][21]
-immutability=1
+immutability=2
 plugin=org.kde.plasma.showdesktop
 
 [Containments][2][Applets][22]
-immutability=1
+immutability=2
 plugin=org.kde.plasma.systemtray
 
 [Containments][2][Applets][22][Configuration][General]
@@ -269,11 +269,11 @@ PreloadWeight=85
 SystrayContainmentId=8
 
 [Containments][2][Applets][23]
-immutability=1
+immutability=2
 plugin=org.kde.plasma.pager
 
 [Containments][2][Applets][24]
-immutability=1
+immutability=2
 plugin=org.kde.plasma.icontasks
 
 [Containments][2][Applets][24][Configuration][General]
@@ -292,9 +292,19 @@ wallpaperplugin=org.kde.image
 itemsOnDisabledScreens=
 screenMapping=desktop:/Google-Chrome.desktop,0,3c740d54-fc8d-4064-86da-42ebb23a559d,desktop:/LibreOffice-Writer.desktop,0,3c740d54-fc8d-4064-86da-42ebb23a559d
 
-[General]
+[Containments][1]
 immutability=2
 EOF
+
+chown root:root /etc/xdg/plasma-org.kde.plasma.desktop-appletsrc
+chmod 644 /etc/xdg/plasma-org.kde.plasma.desktop-appletsrc
+
+cat > /etc/xdg/systemsettingsrc <<EOL
+[KDE Action Restrictions]
+action/systemsettings=false
+action/systemsettings/printers=true
+EOL
+
 
 # Set ownership of configuration files
 chown -R kiosk:kiosk /home/kiosk/.config
