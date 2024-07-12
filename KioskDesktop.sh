@@ -247,6 +247,28 @@ chown -R kiosk:kiosk /home/kiosk/Documents /home/kiosk/Downloads
 #immutability=2
 #EOF
 
+# RESTICT USER
+mv /etc/kde5rc /etc/kde5rc.BAK
+cat > /etc/kde5rc << EOF
+[KDE Action Restrictions][$i]
+action/options_configure=false
+action/properties=false
+action/file_save=true
+action/file_save_as=true
+action/file_revert=true
+action/file_close=true
+action/file_print=true
+action/file_print_preview=true
+action/options_show_toolbar=true
+action/fullscreen=true
+
+[KDE Resource Restrictions][$i]
+print/properties=true
+
+[KDE Control Module Restrictions][$i]
+mouse.desktop=false
+EOF
+
 # disable autolock
 cat > /home/kiosk/.config/kscreenlockerrc << EOF
 [Daemon]
