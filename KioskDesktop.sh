@@ -141,69 +141,157 @@ EOF
 # Set ownership of Chrome policy directory
 chown -R kiosk:kiosk /etc/opt/chrome/policies/managed /home/kiosk/.config
 
+# Create Chrome policy directory
+mkdir -p /etc/opt/chrome/policies/managed
+# Create Chrome policy for bookmarks and URL whitelist
+cat > /etc/opt/chrome/policies/managed/policy.json << EOF
+{
+  "URLAllowlist": ["https://sbb.ch/", "https://chefkoch.de/", "https://wikipedia.org/", "https://akad.ch/",  "https://vhs-lernportal.de/"],
+  "URLBlocklist": ["*"],
+  "HomepageLocation": "https://sbb.ch/",
+  "RestoreOnStartup": 4,
+  "RestoreOnStartupURLs": ["https://sbb.ch/"],
+  "PasswordManagerEnabled": false,
+  "SavingBrowserHistoryDisabled": true,
+  "BrowserAddPersonEnabled":false,
+  "BrowserGuestModeEnabled":false,
+  "BrowserSignin":0,
+  "PrintingEnabled":false,
+  "DeveloperToolsAvailability":2,
+  "TaskManagerEndProcessEnabled":false,
+  "DownloadRestrictions":3,
+  "SharedClipboardEnabled":false,
+  "NewTabPageLocation":"google.com",
+  "SearchSuggestEnabled":false,
+  "EditBookmarksEnabled":false,
+  "BookmarkBarEnabled": true,
+  "ImportBookmarks":false,
+  "ManagedBookmarks": [
+    {"name": "SBB","url": "https://www.sbb.ch/"},
+    {"name": "Chefkoch","url": "https://chefkoch.de/"},
+    {"name": "Wikipedia","url": "https://wikipedia.org/"},
+    {"name": "AKAD","url": "https://akad.ch/"},
+    {"name": "VHS-lernportal","url": "https://vhs-lernportal.de/"}
+  ]
+}
+EOF
+
+# Create Chrome Bookmarks
+mkdir -p /home/kiosk/.config/google-chrome/Default
+cat > /home/kiosk/.config/google-chrome/Default/Bookmarks << EOF
+{
+"checksum": "fe887b6e1145bdc61b6bafe20bdb81fa",
+   "roots": {
+      "bookmark_bar": {
+        "children": [ 
+	 	{"date_added": "13183642538941632","date_last_used": "0","guid": "00000000-0000-0000-0000-000000000001","id": "2","name": "Sbb","type": "url","url": "https://sbb.ch/"},
+   		{"date_added": "13183642538941632","date_last_used": "0","guid": "00000000-0000-0000-0000-000000000002","id": "3","name": "Chefkoch","type": "url","url": "https://chefkoch.de/"}, 
+     		{"date_added": "13183642538941632","date_last_used": "0","guid": "00000000-0000-0000-0000-000000000003","id": "4","name": "Wikipedia","type": "url","url": "https://wikipedia.org/"}, 
+	 	{"date_added": "13183642538941632","date_last_used": "0","guid": "00000000-0000-0000-0000-000000000004","id": "5","name": "AKAD","type": "url","url": "https://akad.ch/"}, 
+		{"date_added": "13183642538941632","date_last_used": "0","guid": "00000000-0000-0000-0000-000000000005","id": "6","name": "VHS-Lernportal","type": "url","url": "https://vhs-lernportal.de/"} 
+  	],
+        "date_added": "13183642538941632",
+        "date_last_used": "0",
+        "date_modified": "13183642538941632",
+        "guid": "0bc5d13f-2cba-5d74-951f-3f233fe6c908",
+        "id": "1",
+        "name": "Lesezeichenleiste",
+        "type": "folder"
+      },
+      "other": {
+         "children": [  ],
+         "date_added": "13183642538941632",
+         "date_last_used": "0",
+         "date_modified": "13183642538941632",
+         "guid": "82b081ec-3dd3-529c-8475-ab6c344590dd",
+         "id": "7",
+         "name": "Weitere Lesezeichen",
+         "type": "folder"
+      },
+      "synced": {
+         "children": [  ],
+         "date_added": "13183642538941632",
+         "date_last_used": "0",
+         "date_modified": "13183642538941632",
+         "guid": "4cf2e351-0e85-532b-bb37-df045d8f8d0f",
+         "id": "8",
+         "name": "Mobile Lesezeichen",
+         "type": "folder"
+      }
+   },
+   "version": 1
+}
+EOF
+
+
+
+
+
+
+
 # Allow access to common directories
 mkdir -p /home/kiosk/Documents /home/kiosk/Downloads
 chown -R kiosk:kiosk /home/kiosk/Documents /home/kiosk/Downloads
 
 # Configure kiosk mode for KDE Plasma
-mkdir -p /etc/xdg
-cat > /home/kiosk/.config/kdeglobals << EOF
-[KDE Action Restrictions][$i]
-action/lock_screen=false
-action/start_new_session=false
-action/switch_user=false
-action/sleep=false
-action/hibernate=false
-shell_access=false
-action/run_command=false
-run_command=false
-action/properties=false
-action/file_properties=false
-action/dolphin/properties=false
-action/file/properties=false
-EOF
+#mkdir -p /etc/xdg
+#cat > /home/kiosk/.config/kdeglobals << EOF
+#[KDE Action Restrictions][$i]
+#action/lock_screen=false
+#action/start_new_session=false
+#action/switch_user=false
+#action/sleep=false
+#action/hibernate=false
+#shell_access=false
+#action/run_command=false
+#run_command=false
+#action/properties=false
+#action/file_properties=false
+#action/dolphin/properties=false
+#action/file/properties=false
+#EOF
 
 # Prevent access to specific System Settings modules
-mkdir -p /etc/xdg/kiosk
-cat > /etc/xdg/kiosk/kioskrc << EOF
-[KDE Control Module Restrictions][$i]
-kcmshell5=kcm_printer_manager.desktop
-kcm_powerdevilprofilesconfig.desktop=false
-kcm_powerdevilactivitiesconfig.desktop=false
-powerdevilglobalconfig.desktop=false
-kcm_activities.desktop=false
-kcm_fonts.desktop=false
-kcm_kscreen.desktop=false
-kcm_users.desktop=false
-kcm_networkmanagement.desktop=false
-kcm_wifi.desktop=false
-kcm_bluetooth.desktop=false
-kcm_desktoptheme.desktop=false
-kcm_workspace.desktop=false
-kcm_lookandfeel.desktop=false
-kcm_notifications.desktop=false
-kcm_regionandlang.desktop=false
-kcm_style.desktop=false
-kcm_keys.desktop=false
-kcm_touchpad.desktop=false
-kcm_mouse.desktop=false
-kcm_solid_actions.desktop=false
-kcm_sddm.desktop=false
-kcm_about-distro.desktop=false
+#mkdir -p /etc/xdg/kiosk
+#cat > /etc/xdg/kiosk/kioskrc << EOF
+#[KDE Control Module Restrictions][$i]
+#kcmshell5=kcm_printer_manager.desktop
+#kcm_powerdevilprofilesconfig.desktop=false
+#kcm_powerdevilactivitiesconfig.desktop=false
+#powerdevilglobalconfig.desktop=false
+#kcm_activities.desktop=false
+#kcm_fonts.desktop=false
+#kcm_kscreen.desktop=false
+#kcm_users.desktop=false
+#kcm_networkmanagement.desktop=false
+#kcm_wifi.desktop=false
+#kcm_bluetooth.desktop=false
+#kcm_desktoptheme.desktop=false
+#kcm_workspace.desktop=false
+#kcm_lookandfeel.desktop=false
+#kcm_notifications.desktop=false
+#kcm_regionandlang.desktop=false
+#kcm_style.desktop=false
+#kcm_keys.desktop=false
+#kcm_touchpad.desktop=false
+#kcm_mouse.desktop=false
+#kcm_solid_actions.desktop=false
+#kcm_sddm.desktop=false
+#kcm_about-distro.desktop=false
 
-[KDE Action Restrictions][$i]
-action/kdesystemsettings=false
-action/systemsettings=false
+#[KDE Action Restrictions][$i]
+#action/kdesystemsettings=false
+#action/systemsettings=false
 
-[General]
-immutability=2
-EOF
+#[General]
+#immutability=2
+#EOF
 
 # Disable autolock
-cat > /home/kiosk/.config/kscreenlockerrc << EOF
-[Daemon]
-Autolock=false
-EOF
+#cat > /home/kiosk/.config/kscreenlockerrc << EOF
+#[Daemon]
+#Autolock=false
+#EOF
 
 # Setup udiskie for automounting USB devices
 cat > /home/kiosk/.config/autostart/udiskie.desktop << EOF
@@ -220,13 +308,13 @@ Comment=Automount USB devices
 EOF
 
 # Set KDE Plasma Kiosk settings
-mkdir -p /etc/xdg/plasma-workspace/env
-cat > /etc/xdg/plasma-workspace/env/kde-kiosk.sh << EOF
-#!/bin/bash
-export KDE_SESSION_VERSION=5
-export KDE_FULL_SESSION=true
-EOF
-chmod +x /etc/xdg/plasma-workspace/env/kde-kiosk.sh
+#mkdir -p /etc/xdg/plasma-workspace/env
+#cat > /etc/xdg/plasma-workspace/env/kde-kiosk.sh << EOF
+##!/bin/bash
+#export KDE_SESSION_VERSION=5
+#export KDE_FULL_SESSION=true
+#EOF
+#chmod +x /etc/xdg/plasma-workspace/env/kde-kiosk.sh
 
 # Configure KDE Plasma panel and desktop layout
 mkdir -p /etc/xdg
@@ -270,13 +358,9 @@ SystrayContainmentId=8
 
 [Containments][2][Applets][23]
 immutability=2
-plugin=org.kde.plasma.pager
-
-[Containments][2][Applets][24]
-immutability=2
 plugin=org.kde.plasma.icontasks
 
-[Containments][2][Applets][24][Configuration][General]
+[Containments][2][Applets][23][Configuration][General]
 launchers=applications:systemsettings.desktop,preferred://filemanager
 
 [Containments][8]
