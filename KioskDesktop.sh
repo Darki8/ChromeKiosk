@@ -250,23 +250,81 @@ chown -R kiosk:kiosk /home/kiosk/Documents /home/kiosk/Downloads
 # RESTICT USER
 mv /etc/kde5rc /etc/kde5rc.BAK
 cat > /etc/kde5rc << EOF
-[KDE Action Restrictions][$i]
-action/options_configure=false
-action/properties=false
-action/file_save=true
-action/file_save_as=true
-action/file_revert=true
-action/file_close=true
-action/file_print=true
-action/file_print_preview=true
-action/options_show_toolbar=true
-action/fullscreen=true
-
-[KDE Resource Restrictions][$i]
-print/properties=true
-
 [KDE Control Module Restrictions][$i]
-mouse.desktop=false
+kcm_energyinfo.desktop=false
+kcm_about-distro.desktop=false
+kcm_kwindecoration.desktop=false
+kcm_kcm_touchpad.desktop=true
+kcm_notifications.desktop=false
+kcm_kwin_effects.desktop=false
+kcm_bluetooth.desktop=false
+kcm_landingpage.desktop=false
+kcm_kscreen.desktop=true
+kcm_workspace.desktop=false
+kcm_smserver.desktop=false
+kcm_autostart.desktop=false
+kcm_desktoptheme.desktop=false
+smb.desktop=false
+kcm_splashscreen.desktop=false
+kcm_nightcolor.desktop=false
+kcm_pulseaudio.desktop=true
+kcm_sddm.desktop=false
+kcm_kded.desktop=false
+kcm_touchscreen.desktop=true
+kcm_keys.desktop=false
+kcm_access.desktop=false
+kcm_plasmasearch.desktop=false
+kcm_kwinxwayland.desktop=false
+kcm_tablet.desktop=false
+kcm_mouse.desktop=true
+kcm_colors.desktop=false
+kcm_kgama.desktop=false
+kcm_lookandfeel.desktop=false
+kcm_cursostheme.desktop=false
+kcm_updates.desktop=false
+kcm_virtualkeyboard.desktop=false
+kcm_kwin_script.desktop=false
+kcm_keyboard.desktop=false
+kcm_feedback.desktop=false
+kcm_style.desktop=false
+kcm_kwin_virtualdesktops.desktop=false
+kcm_componentchooser.desktop=false
+kcm_fonts.desktop=false
+kcm_regionandchooser.desktop=false
+kcm_screenlocker.desktop=false
+kcm_bolt.desktop=false
+kcm_baloofile.desktop=false
+kcm_icons.desktop=false
+kcm_kwinrules.desktop=false
+kwincompositing.desktop=false
+kcm_fontinst.desktop=false
+proxy.desktop=false
+kcm_kwintouchscreen.desktop=false
+kcm_activities.desktop=false
+kcm_desktoppaths.desktop=false
+kcm_filetypes.desktop=false
+kcm_powerdevilglobalconfig.desktop=false
+kcm_solif_actions.desktop=false
+kcm_joystick.desktop=false
+kcmspellschecking.desktop=false
+kcm_networkmanagment.desktop=false
+kcm_clock.desktop=false
+kcm_qtqiocksettings.desktop=false
+cookies.desktop=false
+kcm_device_automounter.desktop=ture
+breezestyleconfig.desktop=false
+kcm_kwinscreenedges.desktop=false
+kcm_kwintabbox.desktop=false
+kcm_powerdevilprofilesconfig.desktop=false
+kcm_kwinoptions.desktop=false
+netpref.desktop=false
+kcm_powerdevilactivitiesconfig.desktop=false
+webshortcuts.desktop=false
+kcm_recentFiles.desktop=false
+kcm_kwinsupportinfo.desktop=false
+kcm_firmware_security.desktop=false
+kcm_vulkan.desktop=false
+kcm_opencl.desktop=false
 EOF
 
 # disable autolock
