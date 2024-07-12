@@ -229,8 +229,8 @@ EOF
 chmod +x /etc/xdg/plasma-workspace/env/kde-kiosk.sh
 
 # Configure KDE Plasma panel and desktop layout
-mkdir -p /home/kiosk/.config/plasma-workspace
-cat > /home/kiosk/.config/plasma-workspace/plasma-org.kde.plasma.desktop-appletsrc << EOF
+mkdir -p /etc/xdg
+cat > /etc/xdg/plasma-org.kde.plasma.desktop-appletsrc << EOF
 [Containments][1]
 activityId=3c740d54-fc8d-4064-86da-42ebb23a559d
 formfactor=0
