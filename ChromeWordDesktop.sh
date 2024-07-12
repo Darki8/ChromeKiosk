@@ -167,6 +167,7 @@ EOF
 mkdir -p /etc/xdg/kiosk
 cat > /etc/xdg/kiosk/kioskrc << EOF
 [KDE Control Module Restrictions][$i]
+kcmshell5=kcm_printer_manager.desktop
 kcm_powerdevilprofilesconfig.desktop=false
 kcm_powerdevilactivitiesconfig.desktop=false
 powerdevilglobalconfig.desktop=false
@@ -228,7 +229,8 @@ EOF
 chmod +x /etc/xdg/plasma-workspace/env/kde-kiosk.sh
 
 # Configure KDE Plasma panel and desktop layout
-cat > /home/kiosk/.config/plasma-org.kde.plasma.desktop-appletsrc << EOF
+mkdir -p /home/kiosk/.config/plasma-workspace
+cat > /home/kiosk/.config/plasma-workspace/plasma-org.kde.plasma.desktop-appletsrc << EOF
 [Containments][1]
 activityId=3c740d54-fc8d-4064-86da-42ebb23a559d
 formfactor=0
@@ -238,8 +240,11 @@ location=0
 plugin=org.kde.plasma.folder
 wallpaperplugin=org.kde.image
 
+[Containments][1][Wallpaper][org.kde.image][General]
+Image=file:///usr/share/wallpapers/Next/contents/images/1920x1080.png
+
 [Containments][2]
-activityId=
+activityId=3c740d54-fc8d-4064-86da-42ebb23a559d
 formfactor=2
 immutability=2
 lastScreen=0
@@ -249,83 +254,39 @@ wallpaperplugin=org.kde.image
 
 [Containments][2][Applets][20]
 immutability=1
-plugin=org.kde.plasma.digitalclock
+plugin=org.kde.plasma.kickoff
 
 [Containments][2][Applets][21]
 immutability=1
 plugin=org.kde.plasma.showdesktop
 
-[Containments][2][Applets][3]
-immutability=1
-plugin=org.kde.plasma.kickoff
-
-[Containments][2][Applets][3][Configuration]
-PreloadWeight=100
-popupHeight=514
-popupWidth=681
-
-[Containments][2][Applets][4]
-immutability=1
-plugin=org.kde.plasma.pager
-
-[Containments][2][Applets][5]
-immutability=1
-plugin=org.kde.plasma.icontasks
-
-[Containments][2][Applets][5][Configuration][General]
-launchers=applications:systemsettings.desktop,preferred://filemanager
-
-[Containments][2][Applets][6]
-immutability=1
-plugin=org.kde.plasma.marginsseparator
-
-[Containments][2][Applets][7]
+[Containments][2][Applets][22]
 immutability=1
 plugin=org.kde.plasma.systemtray
 
-[Containments][2][Applets][7][Configuration]
+[Containments][2][Applets][22][Configuration][General]
 PreloadWeight=85
 SystrayContainmentId=8
 
-[Containments][2][General]
-AppletOrder=3;4;5;6;7;20;21
+[Containments][2][Applets][23]
+immutability=1
+plugin=org.kde.plasma.pager
+
+[Containments][2][Applets][24]
+immutability=1
+plugin=org.kde.plasma.icontasks
+
+[Containments][2][Applets][24][Configuration][General]
+launchers=applications:systemsettings.desktop,preferred://filemanager
 
 [Containments][8]
-activityId=
+activityId=3c740d54-fc8d-4064-86da-42ebb23a559d
 formfactor=2
-immutability=1
+immutability=2
 lastScreen=0
 location=4
 plugin=org.kde.plasma.private.systemtray
-popupHeight=432
-popupWidth=432
 wallpaperplugin=org.kde.image
-
-
-[Containments][8][Applets][12]
-immutability=1
-plugin=org.kde.plasma.notifications
-
-[Containments][8][Applets][12][Configuration]
-PreloadWeight=55
-
-[Containments][8][Applets][14]
-immutability=1
-plugin=org.kde.plasma.volume
-
-[Containments][8][Applets][14][Configuration][General]
-migrated=true
-
-[Containments][8][Applets][15]
-immutability=1
-plugin=org.kde.plasma.devicenotifier
-
-[Containments][8][Applets][24]
-immutability=1
-plugin=org.kde.plasma.networkmanagement
-
-[Containments][8][Applets][24][Configuration]
-PreloadWeight=55
 
 [ScreenMapping]
 itemsOnDisabledScreens=
@@ -335,38 +296,7 @@ screenMapping=desktop:/Google-Chrome.desktop,0,3c740d54-fc8d-4064-86da-42ebb23a5
 immutability=2
 EOF
 
-# Remove unnecessary software from the application launcher and hide options
-cat > /home/kiosk/.config/kdeglobals << EOF
-[KDE]
-SingleClick=false
-
-[KDE Action Restrictions][$i]
-action/lock_screen=false
-action/start_new_session=false
-action/switch_user=false
-action/sleep=false
-action/hibernate=false
-action/logout=false
-shell_access=false
-action/run_command=false
-run_command=false
-action/properties=false
-action/file_properties=false
-action/dolphin/properties=false
-action/file/properties=false
-EOF
-
-# Hide System Settings except for printer settings
-cat > /home/kiosk/.config/kdeglobals << EOF
-[KDE Control Module Restrictions][$i]
-kcmshell5=kcm_printer_manager.desktop
-EOF
-
-# Remove or hide unwanted applications in the launcher
-rm -f /usr/share/applications/kmail.desktop \
-      /usr/share/applications/kwrite.desktop \
-
-# Set permissions for the config files
+# Set ownership of configuration files
 chown -R kiosk:kiosk /home/kiosk/.config
 chmod -R 755 /home/kiosk/.config
 
