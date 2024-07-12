@@ -109,4 +109,265 @@ mkdir -p /etc/opt/chrome/policies/managed
 cat > /etc/opt/chrome/policies/managed/policy.json << EOF
 {
   "URLAllowlist": ["chrome://", "https://sbb.ch/", "https://chefkoch.de/", "https://wikipedia.org/", "https://akad.ch/",  "https://vhs-lernportal.de/"],
- 
+  "URLBlocklist": ["*"],
+  "HomepageLocation": "https://sbb.ch/",
+  "RestoreOnStartup": 4,
+  "RestoreOnStartupURLs": ["https://sbb.ch/"],
+  "PasswordManagerEnabled": false,
+  "SavingBrowserHistoryDisabled": true,
+  "BrowserAddPersonEnabled":false,
+  "BrowserGuestModeEnabled":false,
+  "BrowserSignin":0,
+  "PrintingEnabled":false,
+  "DeveloperToolsAvailability":2,
+  "TaskManagerEndProcessEnabled":false,
+  "DownloadRestrictions":3,
+  "SharedClipboardEnabled":false,
+  "NewTabPageLocation":"google.com",
+  "SearchSuggestEnabled":false,
+  "EditBookmarksEnabled":false,
+  "BookmarkBarEnabled": true,
+  "ImportBookmarks":false,
+  "ManagedBookmarks": [
+    {"name": "SBB","url": "https://www.sbb.ch/"},
+    {"name": "Chefkoch","url": "https://chefkoch.de/"},
+    {"name": "Wikipedia","url": "https://wikipedia.org/"},
+    {"name": "AKAD","url": "https://akad.ch/"},
+    {"name": "VHS-lernportal","url": "https://vhs-lernportal.de/"}
+  ]
+}
+EOF
+
+# Set ownership of Chrome policy directory
+chown -R kiosk:kiosk /etc/opt/chrome/policies/managed /home/kiosk/.config
+
+# Allow access to common directories
+mkdir -p /home/kiosk/Documents /home/kiosk/Downloads
+chown -R kiosk:kiosk /home/kiosk/Documents /home/kiosk/Downloads
+
+# Configure kiosk mode for KDE Plasma
+mkdir -p /etc/xdg
+cat > /home/kiosk/.config/kdeglobals << EOF
+[KDE Action Restrictions][$i]
+action/lock_screen=false
+action/start_new_session=false
+action/switch_user=false
+action/sleep=false
+action/hibernate=false
+shell_access=false
+action/run_command=false
+run_command=false
+action/properties=false
+action/file_properties=false
+action/dolphin/properties=false
+action/file/properties=false
+EOF
+
+# Prevent access to specific System Settings modules
+mkdir -p /etc/xdg/kiosk
+cat > /etc/xdg/kiosk/kioskrc << EOF
+[KDE Control Module Restrictions][$i]
+kcm_powerdevilprofilesconfig.desktop=false
+kcm_powerdevilactivitiesconfig.desktop=false
+powerdevilglobalconfig.desktop=false
+kcm_activities.desktop=false
+kcm_fonts.desktop=false
+kcm_kscreen.desktop=false
+kcm_users.desktop=false
+kcm_networkmanagement.desktop=false
+kcm_wifi.desktop=false
+kcm_bluetooth.desktop=false
+kcm_desktoptheme.desktop=false
+kcm_workspace.desktop=false
+kcm_lookandfeel.desktop=false
+kcm_notifications.desktop=false
+kcm_regionandlang.desktop=false
+kcm_style.desktop=false
+kcm_keys.desktop=false
+kcm_touchpad.desktop=false
+kcm_mouse.desktop=false
+kcm_solid_actions.desktop=false
+kcm_sddm.desktop=false
+kcm_about-distro.desktop=false
+
+[KDE Action Restrictions][$i]
+action/kdesystemsettings=false
+action/systemsettings=false
+
+[General]
+immutability=2
+EOF
+
+# Disable autolock
+cat > /home/kiosk/.config/kscreenlockerrc << EOF
+[Daemon]
+Autolock=false
+EOF
+
+# Setup udiskie for automounting USB devices
+cat > /home/kiosk/.config/autostart/udiskie.desktop << EOF
+[Desktop Entry]
+Type=Application
+Exec=udiskie
+Hidden=false
+NoDisplay=false
+X-GNOME-Autostart-enabled=true
+Name[en_US]=udiskie
+Name=udiskie
+Comment[en_US]=Automount USB devices
+Comment=Automount USB devices
+EOF
+
+# Set KDE Plasma Kiosk settings
+mkdir -p /etc/xdg/plasma-workspace/env
+cat > /etc/xdg/plasma-workspace/env/kde-kiosk.sh << EOF
+#!/bin/bash
+export KDE_SESSION_VERSION=5
+export KDE_FULL_SESSION=true
+EOF
+chmod +x /etc/xdg/plasma-workspace/env/kde-kiosk.sh
+
+# Configure KDE Plasma panel and desktop layout
+cat > /home/kiosk/.config/plasma-org.kde.plasma.desktop-appletsrc << EOF
+[Containments][1]
+activityId=3c740d54-fc8d-4064-86da-42ebb23a559d
+formfactor=0
+immutability=2
+lastScreen=0
+location=0
+plugin=org.kde.plasma.folder
+wallpaperplugin=org.kde.image
+
+[Containments][2]
+activityId=
+formfactor=2
+immutability=2
+lastScreen=0
+location=4
+plugin=org.kde.panel
+wallpaperplugin=org.kde.image
+
+[Containments][2][Applets][20]
+immutability=1
+plugin=org.kde.plasma.digitalclock
+
+[Containments][2][Applets][21]
+immutability=1
+plugin=org.kde.plasma.showdesktop
+
+[Containments][2][Applets][3]
+immutability=1
+plugin=org.kde.plasma.kickoff
+
+[Containments][2][Applets][3][Configuration]
+PreloadWeight=100
+popupHeight=514
+popupWidth=681
+
+[Containments][2][Applets][4]
+immutability=1
+plugin=org.kde.plasma.pager
+
+[Containments][2][Applets][5]
+immutability=1
+plugin=org.kde.plasma.icontasks
+
+[Containments][2][Applets][5][Configuration][General]
+launchers=applications:systemsettings.desktop,preferred://filemanager
+
+[Containments][2][Applets][6]
+immutability=1
+plugin=org.kde.plasma.marginsseparator
+
+[Containments][2][Applets][7]
+immutability=1
+plugin=org.kde.plasma.systemtray
+
+[Containments][2][Applets][7][Configuration]
+PreloadWeight=85
+SystrayContainmentId=8
+
+[Containments][2][General]
+AppletOrder=3;4;5;6;7;20;21
+
+[Containments][8]
+activityId=
+formfactor=2
+immutability=1
+lastScreen=0
+location=4
+plugin=org.kde.plasma.private.systemtray
+popupHeight=432
+popupWidth=432
+wallpaperplugin=org.kde.image
+
+
+[Containments][8][Applets][12]
+immutability=1
+plugin=org.kde.plasma.notifications
+
+[Containments][8][Applets][12][Configuration]
+PreloadWeight=55
+
+[Containments][8][Applets][14]
+immutability=1
+plugin=org.kde.plasma.volume
+
+[Containments][8][Applets][14][Configuration][General]
+migrated=true
+
+[Containments][8][Applets][15]
+immutability=1
+plugin=org.kde.plasma.devicenotifier
+
+[Containments][8][Applets][24]
+immutability=1
+plugin=org.kde.plasma.networkmanagement
+
+[Containments][8][Applets][24][Configuration]
+PreloadWeight=55
+
+[ScreenMapping]
+itemsOnDisabledScreens=
+screenMapping=desktop:/Google-Chrome.desktop,0,3c740d54-fc8d-4064-86da-42ebb23a559d,desktop:/LibreOffice-Writer.desktop,0,3c740d54-fc8d-4064-86da-42ebb23a559d
+
+[General]
+immutability=2
+EOF
+
+# Remove unnecessary software from the application launcher and hide options
+cat > /home/kiosk/.config/kdeglobals << EOF
+[KDE]
+SingleClick=false
+
+[KDE Action Restrictions][$i]
+action/lock_screen=false
+action/start_new_session=false
+action/switch_user=false
+action/sleep=false
+action/hibernate=false
+action/logout=false
+shell_access=false
+action/run_command=false
+run_command=false
+action/properties=false
+action/file_properties=false
+action/dolphin/properties=false
+action/file/properties=false
+EOF
+
+# Hide System Settings except for printer settings
+cat > /home/kiosk/.config/kdeglobals << EOF
+[KDE Control Module Restrictions][$i]
+kcmshell5=kcm_printer_manager.desktop
+EOF
+
+# Remove or hide unwanted applications in the launcher
+rm -f /usr/share/applications/kmail.desktop \
+      /usr/share/applications/kwrite.desktop \
+
+# Set permissions for the config files
+chown -R kiosk:kiosk /home/kiosk/.config
+chmod -R 755 /home/kiosk/.config
+
+echo "Setup complete!"
