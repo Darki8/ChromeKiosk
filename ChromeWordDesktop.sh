@@ -199,13 +199,6 @@ chmod +x /etc/xdg/plasma-workspace/env/kde-kiosk.sh
 
 # Configure KDE Plasma panel and desktop layout
 cat > /home/kiosk/.config/plasma-org.kde.plasma.desktop-appletsrc << EOF
-[ActionPlugins][0]
-RightButton;NoModifier=org.kde.contextmenu
-wheel:Vertical;NoModifier=org.kde.switchdesktop
-
-[ActionPlugins][1]
-RightButton;NoModifier=org.kde.contextmenu
-
 [Containments][1]
 activityId=3c740d54-fc8d-4064-86da-42ebb23a559d
 formfactor=0
@@ -223,6 +216,7 @@ lastScreen=0
 location=4
 plugin=org.kde.panel
 wallpaperplugin=org.kde.image
+
 
 [Containments][2][Applets][20]
 immutability=1
