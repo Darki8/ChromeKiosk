@@ -141,41 +141,6 @@ EOF
 # Set ownership of Chrome policy directory
 chown -R kiosk:kiosk /etc/opt/chrome/policies/managed /home/kiosk/.config
 
-# Create Chrome policy directory
-mkdir -p /etc/opt/chrome/policies/managed
-# Create Chrome policy for bookmarks and URL whitelist
-cat > /etc/opt/chrome/policies/managed/policy.json << EOF
-{
-  "URLAllowlist": ["https://sbb.ch/", "https://chefkoch.de/", "https://wikipedia.org/", "https://akad.ch/",  "https://vhs-lernportal.de/"],
-  "URLBlocklist": ["*"],
-  "HomepageLocation": "https://sbb.ch/",
-  "RestoreOnStartup": 4,
-  "RestoreOnStartupURLs": ["https://sbb.ch/"],
-  "PasswordManagerEnabled": false,
-  "SavingBrowserHistoryDisabled": true,
-  "BrowserAddPersonEnabled":false,
-  "BrowserGuestModeEnabled":false,
-  "BrowserSignin":0,
-  "PrintingEnabled":false,
-  "DeveloperToolsAvailability":2,
-  "TaskManagerEndProcessEnabled":false,
-  "DownloadRestrictions":3,
-  "SharedClipboardEnabled":false,
-  "NewTabPageLocation":"google.com",
-  "SearchSuggestEnabled":false,
-  "EditBookmarksEnabled":false,
-  "BookmarkBarEnabled": true,
-  "ImportBookmarks":false,
-  "ManagedBookmarks": [
-    {"name": "SBB","url": "https://www.sbb.ch/"},
-    {"name": "Chefkoch","url": "https://chefkoch.de/"},
-    {"name": "Wikipedia","url": "https://wikipedia.org/"},
-    {"name": "AKAD","url": "https://akad.ch/"},
-    {"name": "VHS-lernportal","url": "https://vhs-lernportal.de/"}
-  ]
-}
-EOF
-
 # Create Chrome Bookmarks
 mkdir -p /home/kiosk/.config/google-chrome/Default
 cat > /home/kiosk/.config/google-chrome/Default/Bookmarks << EOF
@@ -222,11 +187,6 @@ cat > /home/kiosk/.config/google-chrome/Default/Bookmarks << EOF
    "version": 1
 }
 EOF
-
-
-
-
-
 
 
 # Allow access to common directories
