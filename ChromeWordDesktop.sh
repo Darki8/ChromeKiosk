@@ -166,6 +166,32 @@ cat > /etc/xdg/kiosk/kioskrc << EOF
 kcm_powerdevilprofilesconfig.desktop=false
 kcm_powerdevilactivitiesconfig.desktop=false
 powerdevilglobalconfig.desktop=false
+kcm_activities.desktop=false
+kcm_fonts.desktop=false
+kcm_kscreen.desktop=false
+kcm_users.desktop=false
+kcm_networkmanagement.desktop=false
+kcm_wifi.desktop=false
+kcm_bluetooth.desktop=false
+kcm_desktoptheme.desktop=false
+kcm_workspace.desktop=false
+kcm_lookandfeel.desktop=false
+kcm_notifications.desktop=false
+kcm_regionandlang.desktop=false
+kcm_style.desktop=false
+kcm_keys.desktop=false
+kcm_touchpad.desktop=false
+kcm_mouse.desktop=false
+kcm_solid_actions.desktop=false
+kcm_sddm.desktop=false
+kcm_about-distro.desktop=false
+
+[KDE Action Restrictions][$i]
+action/kdesystemsettings=false
+action/systemsettings=false
+
+[General]
+immutability=2
 EOF
 
 # Disable autolock
@@ -348,6 +374,9 @@ shownItems=org.kde.plasma.devicenotifier
 [ScreenMapping]
 itemsOnDisabledScreens=
 screenMapping=desktop:/Google-Chrome.desktop,0,3c740d54-fc8d-4064-86da-42ebb23a559d,desktop:/LibreOffice-Writer.desktop,0,3c740d54-fc8d-4064-86da-42ebb23a559d
+
+[General]
+immutability=2
 EOF
 
 # Remove unnecessary software from the application launcher and hide options
