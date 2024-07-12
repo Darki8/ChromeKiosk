@@ -380,15 +380,12 @@ screenMapping=desktop:/Google-Chrome.desktop,0,3c740d54-fc8d-4064-86da-42ebb23a5
 immutability=2
 EOF
 
+# Set permissions
 chown root:root /etc/xdg/plasma-org.kde.plasma.desktop-appletsrc
 chmod 644 /etc/xdg/plasma-org.kde.plasma.desktop-appletsrc
 
-cat > /etc/xdg/systemsettingsrc <<EOL
-[KDE Action Restrictions]
-action/systemsettings=false
-action/systemsettings/printers=true
-EOL
-
+# Disable edit of widgets and taskbar
+qdbus org.kde.plasmashell /PlasmaShell evaluateScript "lockCorona(true)"
 
 # Set ownership of configuration files
 chown -R kiosk:kiosk /home/kiosk/.config
