@@ -402,9 +402,8 @@ EOF
 
 # Remove or hide unwanted applications in the launcher
 rm -f /usr/share/applications/kmail.desktop \
-      /usr/share/applications/konsole.desktop \
       /usr/share/applications/kwrite.desktop \
-      /usr/share/applications/org.kde.dolphin.desktop
+      
 
 # Set permissions for the config files
 chown -R kiosk:kiosk /home/kiosk/.config
