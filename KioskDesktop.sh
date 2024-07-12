@@ -247,11 +247,11 @@ chown -R kiosk:kiosk /home/kiosk/Documents /home/kiosk/Downloads
 #immutability=2
 #EOF
 
-# Disable autolock
-#cat > /home/kiosk/.config/kscreenlockerrc << EOF
-#[Daemon]
-#Autolock=false
-#EOF
+# disable autolock
+cat > /home/kiosk/.config/kscreenlockerrc << EOF
+[Daemon]
+Autolock=false
+EOF
 
 # Setup udiskie for automounting USB devices
 cat > /home/kiosk/.config/autostart/udiskie.desktop << EOF
@@ -266,15 +266,6 @@ Name=udiskie
 Comment[en_US]=Automount USB devices
 Comment=Automount USB devices
 EOF
-
-# Set KDE Plasma Kiosk settings
-#mkdir -p /etc/xdg/plasma-workspace/env
-#cat > /etc/xdg/plasma-workspace/env/kde-kiosk.sh << EOF
-##!/bin/bash
-#export KDE_SESSION_VERSION=5
-#export KDE_FULL_SESSION=true
-#EOF
-#chmod +x /etc/xdg/plasma-workspace/env/kde-kiosk.sh
 
 # Configure KDE Plasma panel and desktop layout
 mkdir -p /etc/xdg
