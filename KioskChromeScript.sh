@@ -128,6 +128,11 @@ cat > /etc/opt/chrome/policies/managed/policy.json << EOF
   "EditBookmarksEnabled":false,
   "BookmarkBarEnabled": true,
   "ImportBookmarks":false,
+  "PrintingEnabled": true,
+  "PrintingAllowedBackgroundGraphicsModes": 2,
+  "PrintPreviewUseSystemDefaultPrinter": true,
+  "CloudPrintProxyEnabled": false,
+  "CloudPrintSubmitEnabled": false
   "ManagedBookmarks": [
     {"name": "SBB","url": "https://www.sbb.ch/"},
     {"name": "Chefkoch","url": "https://chefkoch.de/"},
