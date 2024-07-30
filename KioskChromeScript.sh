@@ -119,7 +119,6 @@ cat > /etc/opt/chrome/policies/managed/policy.json << EOF
   "BrowserAddPersonEnabled":false,
   "BrowserGuestModeEnabled":false,
   "BrowserSignin":0,
-  "PrintingEnabled":false,
   "DeveloperToolsAvailability":2,
   "TaskManagerEndProcessEnabled":false,
   "DownloadRestrictions":3,
